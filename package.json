@@ -1,0 +1,9 @@
+{
+  "name": "milin-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MilinHub — พื้นที่สำหรับการเรียนรู้",
+  "scripts": {
+    "build": "echo Static site ready for Vercel"
+  }
+}
