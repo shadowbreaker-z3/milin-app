@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตารางคูณ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            color: #e0d0ff;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .number-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .number-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .number-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .number-btn:active {
+            transform: translateY(0);
+        }
+        .color-1 { background: #ff6b6b; }
+        .color-2 { background: #feca57; color: #333; }
+        .color-3 { background: #48dbfb; }
+        .color-4 { background: #ff9ff3; }
+        .color-5 { background: #54a0ff; }
+        .color-6 { background: #5f27cd; }
+        .color-7 { background: #01a3a4; }
+        .color-8 { background: #f368e0; }
+        .color-9 { background: #ff6348; }
+        .color-10 { background: #7bed9f; color: #333; }
+        .color-11 { background: #70a1ff; }
+        .color-12 { background: #eccc68; color: #333; }
+
+        .game-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .game-area.active { display: block; }
+        .game-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .back-btn {
+            background: #ddd;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #ccc; }
+        .question-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            font-size: 1.8em;
+        }
+        .question-text {
+            color: #333;
+            font-weight: bold;
+        }
+        .answer-input {
+            width: 80px;
+            height: 50px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.9em;
+            text-align: center;
+            margin: 0 10px;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .answer-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        .answer-input.correct {
+            border-color: #2ed573;
+            background: #e8fff0;
+            color: #2ed573;
+        }
+        .answer-input.wrong {
+            border-color: #ff4757;
+            background: #ffe8e8;
+            color: #ff4757;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .check-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        .score {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 40px;
+        }
+        .score.perfect {
+            color: #2ed573;
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .stars {
+            font-size: 2em;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .confetti {
+            position: fixed;
+            top: -10px;
+            font-size: 2em;
+            animation: fall 3s linear forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+        @keyframes fall {
+            to { top: 110vh; opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 ตารางคูณ</h1>
+    <p class="subtitle">เลือกตารางที่ต้องการเล่น</p>
+
+    <div class="number-picker" id="numberPicker">
+        <!-- Generated by JS -->
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <button class="back-btn" onclick="goBack()">← กลับ</button>
+        <h2 class="game-title" id="gameTitle"></h2>
+        <div id="questions"></div>
+        <button class="check-btn" onclick="checkAnswers()">ตรวจคำตอบ ✓</button>
+        <div class="score" id="score"></div>
+        <div class="stars" id="stars"></div>
+    </div>
+
+    <script>
+        // Build number picker (1-12)
+        const picker = document.getElementById('numberPicker');
+        for (let i = 1; i <= 12; i++) {
+            const btn = document.createElement('button');
+            btn.className = `number-btn color-${i}`;
+            btn.textContent = i;
+            btn.onclick = () => startGame(i);
+            picker.appendChild(btn);
+        }
+
+        let currentNumber = 0;
+
+        function startGame(num) {
+            currentNumber = num;
+            document.getElementById('numberPicker').style.display = 'none';
+            document.querySelector('.subtitle').style.display = 'none';
+            document.querySelector('h1').style.display = 'none';
+            document.getElementById('gameTitle').textContent = `ตาราง${num}`;
+
+            const container = document.getElementById('questions');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 12; i++) {
+                const row = document.createElement('div');
+                row.className = 'question-row';
+                row.innerHTML = `
+                    <span class="question-text">${num} × ${i} = </span>
+                    <input type="number" class="answer-input" id="ans-${i}" data-answer="${num * i}" placeholder="?">
+                `;
+                container.appendChild(row);
+            }
+
+            // Enter key navigation
+            const inputs = container.querySelectorAll('.answer-input');
+            inputs.forEach((input, idx) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        if (idx < inputs.length - 1) {
+                            inputs[idx + 1].focus();
+                        } else {
+                            checkAnswers();
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('gameArea').classList.add('active');
+            document.getElementById('score').textContent = '';
+            document.getElementById('stars').textContent = '';
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let total = 12;
+
+            for (let i = 1; i <= 12; i++) {
+                const input = document.getElementById(`ans-${i}`);
+                const answer = parseInt(input.value);
+                const correctAnswer = parseInt(input.dataset.answer);
+
+                input.classList.remove('correct', 'wrong');
+
+                if (answer === correctAnswer) {
+                    input.classList.add('correct');
+                    correct++;
+                } else if (input.value !== '') {
+                    input.classList.add('wrong');
+                }
+            }
+
+            const scoreEl = document.getElementById('score');
+            const starsEl = document.getElementById('stars');
+
+            if (correct === total) {
+                scoreEl.textContent = '🎉 ถูกต้องทุกข้อ! เก่งมาก!';
+                scoreEl.className = 'score perfect';
+                starsEl.textContent = '⭐⭐⭐';
+                launchConfetti();
+            } else if (correct >= 9) {
+                scoreEl.textContent = `👏 ถูก ${correct}/${total} ข้อ! เกือบแล้ว!`;
+                scoreEl.className = 'score';
+                starsEl.textContent = '⭐⭐';
+            } else if (correct >= 6) {
+                scoreEl.textContent = `🙂 ถูก ${correct}/${total} ข้อ ลองอีกครั้งนะ!`;
+                scoreEl.className = 'score';
+                starsEl.textContent = '⭐';
+            } else {
+                scoreEl.textContent = `💪 ถูก ${correct}/${total} ข้อ ลองอีกครั้งนะ!`;
+                scoreEl.className = 'score';
+                starsEl.textContent = '';
+            }
+        }
+
+        function goBack() {
+            document.getElementById('numberPicker').style.display = 'flex';
+            document.querySelector('.subtitle').style.display = 'block';
+            document.querySelector('h1').style.display = 'block';
+            document.getElementById('gameArea').classList.remove('active');
+        }
+
+        function launchConfetti() {
+            const emojis = ['🎉', '🌟', '✨', '🎊', '💫', '🥳', '👏'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
