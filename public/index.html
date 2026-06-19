@@ -135,43 +135,6 @@
             color: rgba(255,255,255,0.7);
         }
 
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 18px;
-            padding: 20px;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.15);
-        }
-        .stat-icon { font-size: 1.8em; margin-bottom: 8px; }
-        .stat-value {
-            font-size: 2em;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        .stat-label {
-            font-size: 0.82em;
-            color: rgba(255,255,255,0.45);
-        }
-        .stat-card.math .stat-value { color: #4facfe; }
-        .stat-card.lang .stat-value { color: #f093fb; }
-        .stat-card.ai .stat-value { color: #43e97b; }
-        .stat-card.weather .stat-value { color: #56ccf2; }
-        .stat-card.creative .stat-value { color: #fd79a8; }
-        .stat-card.schedule .stat-value { color: #a29bfe; }
-        .stat-card.total .stat-value { color: #ffd200; }
-
         /* Widgets */
         .widgets {
             margin-bottom: 28px;
@@ -407,10 +370,6 @@
             z-index: 9;
         }
 
-        @media (max-width: 900px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-        }
-
         @media (max-width: 768px) {
             .menu-toggle { display: block; }
             .sidebar {
@@ -423,7 +382,6 @@
                 margin-left: 0;
                 padding: 70px 20px 32px;
             }
-            .stats { grid-template-columns: repeat(2, 1fr); }
             .welcome h2 { font-size: 1.3em; }
         }
 
@@ -560,44 +518,6 @@
                     </a>
                 </div>
             </section>
-
-            <div class="stats">
-                <div class="stat-card total">
-                    <div class="stat-icon">📚</div>
-                    <div class="stat-value">19</div>
-                    <div class="stat-label">บทเรียนทั้งหมด</div>
-                </div>
-                <div class="stat-card ai">
-                    <div class="stat-icon">🤖</div>
-                    <div class="stat-value">1</div>
-                    <div class="stat-label">AI &amp; สนุก</div>
-                </div>
-                <div class="stat-card schedule">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-value">4</div>
-                    <div class="stat-label">จัดการเวลา</div>
-                </div>
-                <div class="stat-card weather">
-                    <div class="stat-icon">🌤️</div>
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">สภาพอากาศ</div>
-                </div>
-                <div class="stat-card math">
-                    <div class="stat-icon">🔢</div>
-                    <div class="stat-value">5</div>
-                    <div class="stat-label">คณิตศาสตร์</div>
-                </div>
-                <div class="stat-card lang">
-                    <div class="stat-icon">🔤</div>
-                    <div class="stat-value">5</div>
-                    <div class="stat-label">ภาษา</div>
-                </div>
-                <div class="stat-card creative">
-                    <div class="stat-icon">🎨</div>
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">สร้างสรรค์</div>
-                </div>
-            </div>
 
             <!-- AI -->
             <section class="section" id="ai">
