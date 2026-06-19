@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎨 Whiteboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: #2d3436;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .top-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; background: #1e272e;
+            flex-wrap: wrap; z-index: 10;
+        }
+        .hub-link {
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 0.85em; white-space: nowrap;
+        }
+        .hub-link:hover { color: #fff; }
+        .title { color: #fff; font-size: 1.1em; font-weight: 600; margin-right: auto; }
+
+        .tool-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+        .tool-btn {
+            background: #3d4f5f; border: 2px solid transparent;
+            color: #fff; border-radius: 10px; padding: 8px 12px;
+            font-family: inherit; font-size: 0.85em; cursor: pointer;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .tool-btn:hover { background: #4a6274; }
+        .tool-btn.active { border-color: #74b9ff; background: #2c5282; }
+
+        .colors { display: flex; gap: 5px; }
+        .color-btn {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3); cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .color-btn.active { border-color: #fff; transform: scale(1.15); }
+
+        .size-bar { display: flex; gap: 4px; align-items: center; }
+        .size-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: #3d4f5f; border: 2px solid transparent;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .size-btn.active { border-color: #74b9ff; }
+        .size-dot { background: #fff; border-radius: 50%; }
+
+        .canvas-wrap {
+            flex: 1; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            padding: 8px;
+        }
+        canvas {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+            cursor: crosshair;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .saved-panel {
+            position: fixed; right: 0; top: 0; bottom: 0; width: 280px;
+            background: #1e272e; transform: translateX(100%);
+            transition: transform 0.3s; z-index: 20;
+            display: flex; flex-direction: column;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+        }
+        .saved-panel.open { transform: translateX(0); }
+        .saved-header {
+            padding: 16px; color: #fff; font-weight: 600;
+            border-bottom: 1px solid #3d4f5f;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .saved-header button {
+            background: none; border: none; color: #aaa;
+            font-size: 1.2em; cursor: pointer;
+        }
+        .saved-list {
+            flex: 1; overflow-y: auto; padding: 12px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .saved-item {
+            background: #2d3436; border-radius: 12px; overflow: hidden;
+            cursor: pointer; transition: transform 0.15s;
+        }
+        .saved-item:hover { transform: scale(1.02); }
+        .saved-item img { width: 100%; display: block; }
+        .saved-meta {
+            padding: 8px 10px; color: #aaa; font-size: 0.78em;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .saved-meta button {
+            background: none; border: none; color: #e74c3c;
+            cursor: pointer; font-size: 0.9em;
+        }
+        .saved-empty {
+            color: #666; text-align: center; padding: 30px 16px; font-size: 0.9em;
+        }
+
+        .overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4); z-index: 15;
+        }
+        .overlay.open { display: block; }
+
+        @media (max-width: 600px) {
+            .title { display: none; }
+            .tool-btn { padding: 8px 10px; font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="/" class="hub-link">← MilinHub</a>
+        <span class="title">🎨 Whiteboard</span>
+
+        <div class="tool-group colors" id="colors"></div>
+
+        <div class="tool-group size-bar" id="sizes"></div>
+
+        <div class="tool-group">
+            <button class="tool-btn active" id="penBtn" onclick="setTool('pen')">✏️ ปากกา</button>
+            <button class="tool-btn" id="eraserBtn" onclick="setTool('eraser')">🧹 ยางลบ</button>
+            <button class="tool-btn" onclick="undo()">↩️ ย้อน</button>
+            <button class="tool-btn" onclick="clearCanvas()">🗑️ ล้าง</button>
+            <button class="tool-btn" onclick="saveIdea()">💾 บันทึก</button>
+            <button class="tool-btn" onclick="downloadPng()">⬇️ ดาวน์โหลด</button>
+            <button class="tool-btn" onclick="toggleSaved()">📁 ไอเดีย</button>
+        </div>
+    </div>
+
+    <div class="canvas-wrap">
+        <canvas id="board"></canvas>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleSaved(false)"></div>
+    <div class="saved-panel" id="savedPanel">
+        <div class="saved-header">
+            <span>💡 ไอเดียที่บันทึก</span>
+            <button onclick="toggleSaved(false)">✕</button>
+        </div>
+        <div class="saved-list" id="savedList"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        const STORAGE_KEY = 'milin_whiteboard_ideas';
+
+        const COLORS = ['#2d3436','#e74c3c','#e67e22','#f1c40f','#27ae60','#3498db','#9b59b6','#ffffff'];
+        const SIZES = [3, 6, 12, 20];
+
+        let tool = 'pen';
+        let color = COLORS[0];
+        let size = SIZES[1];
+        let drawing = false;
+        let lastX = 0, lastY = 0;
+        const undoStack = [];
+
+        function initCanvas() {
+            const saved = canvas.width > 0 ? canvas.toDataURL() : null;
+            const wrap = canvas.parentElement;
+            const w = Math.min(wrap.clientWidth - 16, 1200);
+            const h = Math.min(wrap.clientHeight - 16, 800);
+            canvas.width = w;
+            canvas.height = h;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+            if (saved) {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0, w, h);
+                img.src = saved;
+            }
+        }
+
+        function pushUndo() {
+            undoStack.push(canvas.toDataURL('image/png'));
+            if (undoStack.length > 30) undoStack.shift();
+        }
+
+        function undo() {
+            if (!undoStack.length) return;
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = undoStack.pop();
+        }
+
+        function clearCanvas() {
+            if (!confirm('ล้างกระดานทั้งหมด?')) return;
+            pushUndo();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function setTool(t) {
+            tool = t;
+            document.getElementById('penBtn').classList.toggle('active', t === 'pen');
+            document.getElementById('eraserBtn').classList.toggle('active', t === 'eraser');
+            canvas.style.cursor = t === 'eraser' ? 'cell' : 'crosshair';
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const src = e.touches ? e.touches[0] : e;
+            return {
+                x: (src.clientX - rect.left) * scaleX,
+                y: (src.clientY - rect.top) * scaleY,
+            };
+        }
+
+        function startDraw(e) {
+            e.preventDefault();
+            pushUndo();
+            drawing = true;
+            const p = getPos(e);
+            lastX = p.x; lastY = p.y;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            drawDot(p.x, p.y);
+        }
+
+        function drawDot(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+            ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
+            ctx.fill();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            e.preventDefault();
+            const p = getPos(e);
+            ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color;
+            ctx.lineWidth = tool === 'eraser' ? size * 2 : size;
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            lastX = p.x; lastY = p.y;
+        }
+
+        function stopDraw() { drawing = false; }
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mouseleave', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, { passive: false });
+        canvas.addEventListener('touchmove', draw, { passive: false });
+        canvas.addEventListener('touchend', stopDraw);
+
+        function downloadPng() {
+            const a = document.createElement('a');
+            a.download = 'whiteboard-' + Date.now() + '.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+
+        function saveIdea() {
+            const ideas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            ideas.unshift({
+                id: Date.now(),
+                data: canvas.toDataURL('image/jpeg', 0.7),
+                date: new Date().toLocaleString('th-TH'),
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas.slice(0, 20)));
+            renderSaved();
+            alert('บันทึกไอเดียเรียบร้อย!');
+        }
+
+        function loadIdea(data) {
+            pushUndo();
+            const img = new Image();
+            img.onload = () => {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                const w = img.width * scale;
+                const h = img.height * scale;
+                ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+            };
+            img.src = data;
+            toggleSaved(false);
+        }
+
+        function deleteIdea(id) {
+            let ideas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            ideas = ideas.filter(i => i.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+            renderSaved();
+        }
+
+        function renderSaved() {
+            const ideas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const list = document.getElementById('savedList');
+            if (!ideas.length) {
+                list.innerHTML = '<div class="saved-empty">ยังไม่มีไอเดียที่บันทึก<br>วาดแล้วกด 💾 บันทึก</div>';
+                return;
+            }
+            list.innerHTML = '';
+            ideas.forEach(idea => {
+                const div = document.createElement('div');
+                div.className = 'saved-item';
+                div.innerHTML = `
+                    <img src="${idea.data}" alt="ไอเดีย">
+                    <div class="saved-meta">
+                        <span>${idea.date}</span>
+                        <button title="ลบ">🗑️</button>
+                    </div>`;
+                div.querySelector('img').onclick = () => loadIdea(idea.data);
+                div.querySelector('button').onclick = (e) => { e.stopPropagation(); deleteIdea(idea.id); };
+                list.appendChild(div);
+            });
+        }
+
+        function toggleSaved(open) {
+            const panel = document.getElementById('savedPanel');
+            const overlay = document.getElementById('overlay');
+            const isOpen = open ?? !panel.classList.contains('open');
+            panel.classList.toggle('open', isOpen);
+            overlay.classList.toggle('open', isOpen);
+            if (isOpen) renderSaved();
+        }
+
+        COLORS.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'color-btn' + (c === color ? ' active' : '');
+            btn.style.background = c;
+            if (c === '#ffffff') btn.style.border = '2px solid #ccc';
+            btn.onclick = () => {
+                color = c;
+                setTool('pen');
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            document.getElementById('colors').appendChild(btn);
+        });
+
+        SIZES.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'size-btn' + (s === size ? ' active' : '');
+            btn.innerHTML = `<div class="size-dot" style="width:${s}px;height:${s}px"></div>`;
+            btn.onclick = () => {
+                size = s;
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            document.getElementById('sizes').appendChild(btn);
+        });
+
+        initCanvas();
+        window.addEventListener('resize', initCanvas);
+    </script>
+</body>
+</html>

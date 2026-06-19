@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📅 แปลงปี พ.ศ. ↔ ค.ศ.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .wrap { max-width: 460px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.95em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 28px 24px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+        }
+        h1 {
+            text-align: center; font-size: 1.5em;
+            color: #c44569; margin-bottom: 4px;
+        }
+        .subtitle {
+            text-align: center; font-size: 0.88em;
+            color: #888; margin-bottom: 20px;
+        }
+
+        .today-box {
+            background: linear-gradient(135deg, #fff0f6, #fce4ec);
+            border-radius: 14px; padding: 14px 18px;
+            text-align: center; margin-bottom: 22px;
+            border: 1px solid #f8bbd0;
+        }
+        .today-box .lbl { font-size: 0.78em; color: #999; margin-bottom: 4px; }
+        .today-box .vals {
+            display: flex; justify-content: center; gap: 20px;
+            font-weight: 700; font-size: 1.05em;
+        }
+        .today-box .be { color: #c44569; }
+        .today-box .ce { color: #6c5ce7; }
+
+        .converter { display: flex; flex-direction: column; gap: 12px; }
+
+        .field {
+            background: #fafafa;
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 16px 18px;
+            transition: border-color 0.2s;
+        }
+        .field:focus-within { border-color: #f093fb; }
+        .field label {
+            display: block; font-size: 0.82em;
+            font-weight: 600; color: #888; margin-bottom: 6px;
+        }
+        .field input {
+            width: 100%; border: none; background: transparent;
+            font-family: inherit; font-size: 2em; font-weight: 700;
+            color: #333; outline: none;
+        }
+        .field.be input { color: #c44569; }
+        .field.ce input { color: #6c5ce7; }
+        .field input::placeholder { color: #ddd; font-weight: 400; font-size: 0.6em; }
+
+        .swap-wrap { display: flex; justify-content: center; }
+        .swap-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 2px solid #f093fb; background: #fff;
+            font-size: 1.4em; cursor: pointer;
+            transition: transform 0.3s, background 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .swap-btn:hover { background: #fff0f6; }
+        .swap-btn.spin { transform: rotate(180deg); }
+
+        .result-line {
+            text-align: center; font-size: 0.92em;
+            color: #666; min-height: 1.4em; margin-top: 4px;
+        }
+        .result-line strong { color: #c44569; }
+
+        .quick-title {
+            font-size: 0.88em; font-weight: 600; color: #666;
+            margin: 22px 0 10px;
+        }
+        .quick-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .quick-btn {
+            background: #f8f8f8; border: 1px solid #eee;
+            border-radius: 12px; padding: 10px 12px;
+            font-family: inherit; font-size: 0.85em;
+            cursor: pointer; text-align: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .quick-btn:hover { background: #fff0f6; border-color: #f093fb; }
+        .quick-btn .be { color: #c44569; font-weight: 600; }
+        .quick-btn .ce { color: #6c5ce7; font-size: 0.85em; }
+
+        .formula {
+            margin-top: 20px; background: #f5f5f5;
+            border-radius: 12px; padding: 14px;
+            font-size: 0.85em; color: #666; line-height: 1.7;
+        }
+        .formula strong { color: #c44569; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+
+        <div class="card">
+            <h1>📅 แปลงปี พ.ศ. ↔ ค.ศ.</h1>
+            <p class="subtitle">พุทธศักราช ↔ คริสต์ศักราช</p>
+
+            <div class="today-box">
+                <div class="lbl">ปีปัจจุบัน</div>
+                <div class="vals">
+                    <span class="be" id="todayBe"></span>
+                    <span>↔</span>
+                    <span class="ce" id="todayCe"></span>
+                </div>
+            </div>
+
+            <div class="converter">
+                <div class="field be">
+                    <label>พุทธศักราช (พ.ศ.)</label>
+                    <input type="number" id="inputBe" placeholder="เช่น 2569" inputmode="numeric">
+                </div>
+
+                <div class="swap-wrap">
+                    <button class="swap-btn" id="swapBtn" title="สลับทิศทาง">⇅</button>
+                </div>
+
+                <div class="field ce">
+                    <label>คริสต์ศักราช (ค.ศ.)</label>
+                    <input type="number" id="inputCe" placeholder="เช่น 2026" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="result-line" id="resultLine"></div>
+
+            <div class="quick-title">⚡ เลือกปีด่วน</div>
+            <div class="quick-grid" id="quickGrid"></div>
+
+            <div class="formula">
+                <strong>สูตรแปลง:</strong><br>
+                ค.ศ. = พ.ศ. − 543<br>
+                พ.ศ. = ค.ศ. + 543<br><br>
+                ตัวอย่าง: พ.ศ. 2569 − 543 = <strong>ค.ศ. 2026</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const OFFSET = 543;
+        const inputBe = document.getElementById('inputBe');
+        const inputCe = document.getElementById('inputCe');
+        const resultLine = document.getElementById('resultLine');
+        const swapBtn = document.getElementById('swapBtn');
+
+        let activeField = 'be';
+
+        const now = new Date();
+        const currentCe = now.getFullYear();
+        const currentBe = currentCe + OFFSET;
+
+        document.getElementById('todayBe').textContent = `พ.ศ. ${currentBe}`;
+        document.getElementById('todayCe').textContent = `ค.ศ. ${currentCe}`;
+
+        function fmt(n) {
+            return Number(n).toLocaleString('th-TH');
+        }
+
+        function beToCe(be) { return be - OFFSET; }
+        function ceToBe(ce) { return ce + OFFSET; }
+
+        function setResult(text) {
+            resultLine.innerHTML = text;
+        }
+
+        function convertFromBe() {
+            const val = inputBe.value.trim();
+            if (val === '' || val === '-') {
+                inputCe.value = '';
+                setResult('');
+                return;
+            }
+            const be = parseInt(val, 10);
+            if (isNaN(be)) return;
+            const ce = beToCe(be);
+            inputCe.value = ce;
+            setResult(`<strong>พ.ศ. ${fmt(be)}</strong> = ค.ศ. ${fmt(ce)}`);
+        }
+
+        function convertFromCe() {
+            const val = inputCe.value.trim();
+            if (val === '' || val === '-') {
+                inputBe.value = '';
+                setResult('');
+                return;
+            }
+            const ce = parseInt(val, 10);
+            if (isNaN(ce)) return;
+            const be = ceToBe(ce);
+            inputBe.value = be;
+            setResult(`<strong>ค.ศ. ${fmt(ce)}</strong> = พ.ศ. ${fmt(be)}`);
+        }
+
+        inputBe.addEventListener('focus', () => { activeField = 'be'; });
+        inputCe.addEventListener('focus', () => { activeField = 'ce'; });
+
+        inputBe.addEventListener('input', () => {
+            activeField = 'be';
+            convertFromBe();
+        });
+        inputCe.addEventListener('input', () => {
+            activeField = 'ce';
+            convertFromCe();
+        });
+
+        swapBtn.addEventListener('click', () => {
+            swapBtn.classList.add('spin');
+            setTimeout(() => swapBtn.classList.remove('spin'), 300);
+            const beVal = inputBe.value;
+            const ceVal = inputCe.value;
+            if (activeField === 'be' && beVal) {
+                convertFromBe();
+            } else if (ceVal) {
+                convertFromCe();
+            } else if (beVal) {
+                convertFromBe();
+            }
+        });
+
+        const quickYears = [
+            { be: 2500, label: 'พ.ศ. 2500' },
+            { be: 2540, label: 'พ.ศ. 2540' },
+            { be: currentBe, label: 'ปีนี้' },
+            { be: currentBe + 1, label: 'ปีหน้า' },
+            { be: 2600, label: 'พ.ศ. 2600' },
+            { be: 2700, label: 'พ.ศ. 2700' },
+        ];
+
+        const quickGrid = document.getElementById('quickGrid');
+        quickGrid.innerHTML = quickYears.map(y => {
+            const ce = beToCe(y.be);
+            return `<button class="quick-btn" data-be="${y.be}">
+                <div class="be">${y.label}</div>
+                <div class="ce">= ค.ศ. ${fmt(ce)}</div>
+            </button>`;
+        }).join('');
+
+        quickGrid.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                inputBe.value = btn.dataset.be;
+                activeField = 'be';
+                convertFromBe();
+                inputBe.focus();
+            });
+        });
+
+        inputBe.value = currentBe;
+        convertFromBe();
+    </script>
+</body>
+</html>

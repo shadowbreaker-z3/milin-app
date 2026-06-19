@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😷 ค่าฝุ่น PM2.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: linear-gradient(160deg, #434343 0%, #757575 50%, #a8a8a8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .wrap { max-width: 720px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.95em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+        h1 { text-align: center; font-size: 2em; margin-bottom: 4px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 20px; font-size: 0.95em; }
+
+        .search-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-bar input {
+            flex: 1; min-width: 160px; padding: 12px 16px; border: none;
+            border-radius: 14px; font-family: inherit; font-size: 1em; outline: none;
+        }
+        .search-bar button {
+            padding: 12px 18px; border: none; border-radius: 14px;
+            font-family: inherit; font-size: 0.95em; cursor: pointer;
+            background: rgba(255,255,255,0.2); color: #fff;
+            border: 1px solid rgba(255,255,255,0.3); white-space: nowrap;
+        }
+        .search-bar button.primary { background: #fff; color: #434343; font-weight: 600; }
+        .search-bar button:hover { background: rgba(255,255,255,0.3); }
+        .search-bar button.primary:hover { background: #f5f5f5; }
+
+        .panel {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .current { text-align: center; }
+        .location-name { font-size: 1.3em; font-weight: 600; margin-bottom: 4px; }
+        .location-country { font-size: 0.85em; color: rgba(255,255,255,0.6); margin-bottom: 16px; }
+
+        .pm-circle {
+            width: 160px; height: 160px; border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border: 4px solid rgba(255,255,255,0.3);
+            transition: background 0.4s;
+        }
+        .pm-value { font-size: 2.8em; font-weight: 700; line-height: 1; }
+        .pm-unit { font-size: 0.75em; opacity: 0.85; margin-top: 2px; }
+        .pm-emoji { font-size: 2em; margin-bottom: 4px; }
+        .pm-label { font-size: 1.3em; font-weight: 600; margin-bottom: 8px; }
+        .aqi-info { font-size: 0.95em; color: rgba(255,255,255,0.75); margin-bottom: 12px; }
+
+        .tip-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 14px 16px;
+            text-align: left; font-size: 0.92em; line-height: 1.55;
+            color: rgba(255,255,255,0.9);
+        }
+        .tip-box strong { display: block; margin-bottom: 6px; }
+
+        .section-title {
+            font-size: 1em; font-weight: 600; margin-bottom: 12px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .forecast-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+        }
+        .hour-card {
+            flex-shrink: 0; min-width: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 12px 10px; text-align: center;
+        }
+        .hour-time { font-size: 0.78em; color: rgba(255,255,255,0.65); margin-bottom: 6px; }
+        .hour-pm { font-size: 1.2em; font-weight: 700; margin: 4px 0; }
+        .hour-bar-wrap {
+            height: 60px; display: flex; align-items: flex-end; justify-content: center;
+            margin-bottom: 4px;
+        }
+        .hour-bar {
+            width: 24px; border-radius: 6px 6px 0 0;
+            transition: height 0.3s;
+        }
+
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+            margin-top: 14px; font-size: 0.75em;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .loading, .error-box {
+            text-align: center; padding: 60px 20px;
+            font-size: 1.1em; color: rgba(255,255,255,0.8);
+        }
+        .error-box { color: #ffcdd2; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #content { display: none; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>😷 ค่าฝุ่น PM2.5</h1>
+        <p class="subtitle">ข้อมูลจาก Open-Meteo — ฟรี ไม่ต้องใช้ API key</p>
+
+        <div class="search-bar">
+            <input type="text" id="cityInput" placeholder="ค้นหาเมือง เช่น Bangkok">
+            <button class="primary" onclick="searchCity()">🔍 ค้นหา</button>
+            <button onclick="useMyLocation()">📍 ตำแหน่งฉัน</button>
+        </div>
+
+        <div id="status">
+            <div class="loading"><div class="spinner"></div>กำลังโหลดข้อมูล...</div>
+        </div>
+
+        <div id="content">
+            <div class="panel current">
+                <div class="location-name" id="locName"></div>
+                <div class="location-country" id="locCountry"></div>
+                <div class="pm-emoji" id="pmEmoji"></div>
+                <div class="pm-circle" id="pmCircle">
+                    <div class="pm-value" id="pmValue">-</div>
+                    <div class="pm-unit">µg/m³</div>
+                </div>
+                <div class="pm-label" id="pmLabel"></div>
+                <div class="aqi-info" id="aqiInfo"></div>
+                <div class="tip-box" id="tipBox"></div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title">📊 พยากรณ์ PM2.5 รายชั่วโมง (96 ชม.)</div>
+                <div class="forecast-scroll" id="forecast"></div>
+                <div class="legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:#27ae60"></span>ดีมาก</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#2ecc71"></span>ดี</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#f1c40f"></span>ปานกลาง</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#e67e22"></span>เริ่มมีผล</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span>ไม่ดี</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function pm25Level(v) {
+            if (v == null) return { label: 'ไม่มีข้อมูล', emoji: '❓', color: '#999' };
+            if (v <= 15) return { label: 'ดีมาก', emoji: '😊', color: '#27ae60' };
+            if (v <= 25) return { label: 'ดี', emoji: '🙂', color: '#2ecc71' };
+            if (v <= 37) return { label: 'ปานกลาง', emoji: '😐', color: '#f1c40f' };
+            if (v <= 75) return { label: 'เริ่มมีผลต่อสุขภาพ', emoji: '😷', color: '#e67e22' };
+            if (v <= 150) return { label: 'ไม่ดีต่อสุขภาพ', emoji: '😨', color: '#e74c3c' };
+            return { label: 'อันตราย', emoji: '🚫', color: '#8e44ad' };
+        }
+
+        function healthTip(level) {
+            const tips = {
+                'ดีมาก': 'อากาศดีมาก เล่นกลางแจ้งได้สบายใจเลย!',
+                'ดี': 'อากาศดี เล่นกลางแจ้งได้ตามปกติ',
+                'ปานกลาง': 'ฝุ่นปานกลาง ถ้าไอบ่อยให้ใส่หน้ากากนะ',
+                'เริ่มมีผลต่อสุขภาพ': 'ฝุ่นเริ่มสูง ควรเล่นในร่ม และใส่หน้ากากเมื่อออกไปข้างนอก',
+                'ไม่ดีต่อสุขภาพ': 'ฝุ่นสูง อยู่ในร่มและลดกิจกรรมกลางแจ้ง',
+                'อันตราย': 'ฝุ่นอันตราย อยู่ในร่ม ใส่หน้ากาก N95 ถ้าจำเป็นต้องออกไป',
+            };
+            return tips[level.label] || 'ตรวจสอบค่าฝุ่นก่อนออกไปเล่นทุกครั้งนะ';
+        }
+
+        function fmtDayHour(iso) {
+            const d = new Date(iso);
+            const today = new Date();
+            const isToday = d.toDateString() === today.toDateString();
+            const time = d.getHours().toString().padStart(2, '0') + ':00';
+            if (isToday) return time;
+            const days = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+            return days[d.getDay()] + ' ' + time;
+        }
+
+        function showLoading(msg = 'กำลังโหลดข้อมูล...') {
+            document.getElementById('status').innerHTML =
+                `<div class="loading"><div class="spinner"></div>${msg}</div>`;
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function showError(msg) {
+            document.getElementById('status').innerHTML = `<div class="error-box">❌ ${msg}</div>`;
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function render(data) {
+            const pm = data.current.pm2_5;
+            const level = pm25Level(pm);
+
+            document.getElementById('locName').textContent = data.location.name;
+            document.getElementById('locCountry').textContent = data.location.country;
+            document.getElementById('pmEmoji').textContent = level.emoji;
+            document.getElementById('pmValue').textContent = pm != null ? pm.toFixed(1) : '-';
+            document.getElementById('pmLabel').textContent = level.label;
+            document.getElementById('pmCircle').style.background = level.color;
+
+            const aqi = data.current.european_aqi;
+            document.getElementById('aqiInfo').textContent = aqi != null
+                ? `European AQI: ${Math.round(aqi)}`
+                : '';
+
+            document.getElementById('tipBox').innerHTML =
+                `<strong>💡 คำแนะนำ</strong>${healthTip(level)}`;
+
+            const forecastEl = document.getElementById('forecast');
+            forecastEl.innerHTML = '';
+            const hours = data.hourly || [];
+            const maxPm = Math.max(...hours.map(h => h.pm2_5 || 0), pm || 1);
+
+            hours.slice(0, 24).forEach(h => {
+                const val = h.pm2_5;
+                const lv = pm25Level(val);
+                const barH = val != null ? Math.max(8, (val / maxPm) * 50) : 8;
+                forecastEl.innerHTML += `
+                    <div class="hour-card">
+                        <div class="hour-time">${fmtDayHour(h.time)}</div>
+                        <div class="hour-bar-wrap">
+                            <div class="hour-bar" style="height:${barH}px;background:${lv.color}"></div>
+                        </div>
+                        <div class="hour-pm">${val != null ? val.toFixed(0) : '-'}</div>
+                    </div>`;
+            });
+
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        async function fetchAirQuality(params) {
+            showLoading();
+            try {
+                const qs = new URLSearchParams(params).toString();
+                const res = await fetch('/api/air-quality?' + qs);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+                render(data);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function searchCity() {
+            const q = document.getElementById('cityInput').value.trim();
+            if (!q) return;
+            fetchAirQuality({ q });
+        }
+
+        function useMyLocation() {
+            if (!navigator.geolocation) {
+                showError('เบราว์เซอร์ไม่รองรับ GPS');
+                return;
+            }
+            showLoading('กำลังหาตำแหน่ง...');
+            navigator.geolocation.getCurrentPosition(
+                pos => fetchAirQuality({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                () => showError('ไม่สามารถเข้าถึงตำแหน่งได้ ลองค้นหาเมืองแทน'),
+                { timeout: 10000 }
+            );
+        }
+
+        document.getElementById('cityInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') searchCity();
+        });
+
+        fetchAirQuality({ q: 'Bangkok' });
+    </script>
+</body>
+</html>

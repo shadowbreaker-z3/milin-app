@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚖️ คำนวณ BMI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #11998e 0%, #38ef7d 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .wrap { max-width: 480px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.95em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 28px 24px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+        }
+        h1 {
+            text-align: center; font-size: 1.6em;
+            color: #11998e; margin-bottom: 4px;
+        }
+        .subtitle {
+            text-align: center; font-size: 0.88em;
+            color: #888; margin-bottom: 24px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; font-size: 0.92em; margin-bottom: 8px; color: #444;
+        }
+        .form-group label span { color: #11998e; font-size: 1.1em; }
+
+        input[type="range"] {
+            width: 100%; height: 8px; border-radius: 4px;
+            background: #e0f5f0; outline: none;
+            -webkit-appearance: none; appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 22px; height: 22px;
+            border-radius: 50%; background: #11998e;
+            cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        input[type="number"] {
+            width: 100%; padding: 12px 16px;
+            border: 2px solid #e0f5f0; border-radius: 12px;
+            font-family: inherit; font-size: 1.1em;
+            outline: none; transition: border-color 0.2s;
+        }
+        input[type="number"]:focus { border-color: #11998e; }
+
+        .btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border: none; border-radius: 14px;
+            color: #fff; font-family: inherit;
+            font-size: 1.05em; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s;
+            margin-bottom: 20px;
+        }
+        .btn:hover { opacity: 0.92; }
+
+        .result {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+        .result.show { display: block; }
+        .result.under { background: #e3f2fd; border: 2px solid #64b5f6; }
+        .result.normal { background: #e8f5e9; border: 2px solid #66bb6a; }
+        .result.over { background: #fff8e1; border: 2px solid #ffca28; }
+        .result.obese1 { background: #fff3e0; border: 2px solid #ff9800; }
+        .result.obese2 { background: #ffebee; border: 2px solid #ef5350; }
+
+        .bmi-value {
+            font-size: 3em; font-weight: 700; line-height: 1;
+            margin-bottom: 4px;
+        }
+        .bmi-label { font-size: 1.2em; font-weight: 600; margin-bottom: 8px; }
+        .bmi-desc { font-size: 0.88em; color: #666; line-height: 1.5; }
+
+        .scale {
+            margin-top: 16px; position: relative;
+        }
+        .scale-bar {
+            display: flex; height: 12px; border-radius: 6px; overflow: hidden;
+        }
+        .scale-bar span { flex: 1; }
+        .scale-bar .s1 { background: #64b5f6; }
+        .scale-bar .s2 { background: #66bb6a; }
+        .scale-bar .s3 { background: #ffca28; }
+        .scale-bar .s4 { background: #ff9800; }
+        .scale-bar .s5 { background: #ef5350; }
+        .scale-marker {
+            position: absolute; top: -4px;
+            width: 4px; height: 20px;
+            background: #333; border-radius: 2px;
+            transform: translateX(-50%);
+            transition: left 0.4s ease;
+        }
+        .scale-labels {
+            display: flex; justify-content: space-between;
+            font-size: 0.65em; color: #999; margin-top: 6px;
+        }
+
+        .formula {
+            background: #f5f5f5; border-radius: 12px;
+            padding: 14px; font-size: 0.85em; color: #666;
+            line-height: 1.6;
+        }
+        .formula strong { color: #11998e; }
+
+        .table-title {
+            font-size: 0.9em; font-weight: 600; color: #444;
+            margin: 20px 0 10px;
+        }
+        .ref-table {
+            width: 100%; border-collapse: collapse; font-size: 0.82em;
+        }
+        .ref-table th, .ref-table td {
+            padding: 8px 10px; text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .ref-table th { color: #888; font-weight: 600; }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+
+        <div class="card">
+            <h1>⚖️ คำนวณ BMI</h1>
+            <p class="subtitle">ดัชนีมวลกาย (Body Mass Index)</p>
+
+            <div class="form-group">
+                <label>ส่วนสูง <span id="heightVal">150</span> ซม.</label>
+                <input type="range" id="heightRange" min="100" max="220" value="150">
+                <input type="number" id="heightInput" min="100" max="250" value="150" placeholder="ส่วนสูง (ซม.)" style="margin-top:8px">
+            </div>
+
+            <div class="form-group">
+                <label>น้ำหนัก <span id="weightVal">45</span> กก.</label>
+                <input type="range" id="weightRange" min="20" max="150" value="45">
+                <input type="number" id="weightInput" min="10" max="200" value="45" placeholder="น้ำหนัก (กก.)" style="margin-top:8px">
+            </div>
+
+            <button class="btn" id="calcBtn">คำนวณ BMI</button>
+
+            <div class="result" id="result">
+                <div class="bmi-value" id="bmiValue">—</div>
+                <div class="bmi-label" id="bmiLabel">—</div>
+                <div class="bmi-desc" id="bmiDesc"></div>
+                <div class="scale">
+                    <div class="scale-bar">
+                        <span class="s1"></span><span class="s2"></span><span class="s3"></span>
+                        <span class="s4"></span><span class="s5"></span>
+                    </div>
+                    <div class="scale-marker" id="marker" style="left:50%"></div>
+                    <div class="scale-labels">
+                        <span>18.5</span><span>23</span><span>25</span><span>30</span><span>40</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="formula">
+                <strong>สูตร:</strong> BMI = น้ำหนัก (kg) ÷ ส่วนสูง (m)²<br>
+                ตัวอย่าง: 45 ÷ (1.50)² = 45 ÷ 2.25 = <strong>20.0</strong>
+            </div>
+
+            <div class="table-title">เกณฑ์ BMI สำหรับคนไทย (ผู้ใหญ่)</div>
+            <table class="ref-table">
+                <tr><th>ช่วง BMI</th><th>สถานะ</th></tr>
+                <tr><td><span class="dot" style="background:#64b5f6"></span>&lt; 18.5</td><td>น้ำหนักต่ำกว่าเกณฑ์</td></tr>
+                <tr><td><span class="dot" style="background:#66bb6a"></span>18.5 – 22.9</td><td>ปกติ</td></tr>
+                <tr><td><span class="dot" style="background:#ffca28"></span>23.0 – 24.9</td><td>น้ำหนักเกิน</td></tr>
+                <tr><td><span class="dot" style="background:#ff9800"></span>25.0 – 29.9</td><td>อ้วน</td></tr>
+                <tr><td><span class="dot" style="background:#ef5350"></span>≥ 30.0</td><td>อ้วนมาก</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const CATEGORIES = [
+            { max: 18.5, cls: 'under', label: 'น้ำหนักต่ำกว่าเกณฑ์', color: '#64b5f6',
+              desc: 'น้ำหนักน้อยกว่าเกณฑ์ที่เหมาะสม ควรรับประทานอาหารที่มีประโยชน์ครบถ้วน' },
+            { max: 23, cls: 'normal', label: 'น้ำหนักปกติ', color: '#66bb6a',
+              desc: 'ยินดีด้วย! น้ำหนักอยู่ในเกณฑ์ที่ดี ควรออกกำลังกายและกินอาหารที่มีประโยชน์สม่ำเสมอ' },
+            { max: 25, cls: 'over', label: 'น้ำหนักเกิน', color: '#ffca28',
+              desc: 'น้ำหนักเริ่มเกินเกณฑ์ ควรควบคุมอาหารและออกกำลังกายเพิ่มขึ้น' },
+            { max: 30, cls: 'obese1', label: 'อ้วน', color: '#ff9800',
+              desc: 'น้ำหนักเกินเกณฑ์มาก ควรปรึกษาแพทย์หรือนักโภชนาการ' },
+            { max: Infinity, cls: 'obese2', label: 'อ้วนมาก', color: '#ef5350',
+              desc: 'น้ำหนักเกินเกณฑ์อย่างมาก ควรปรึกษาแพทย์เพื่อดูแลสุขภาพ' },
+        ];
+
+        const heightRange = document.getElementById('heightRange');
+        const heightInput = document.getElementById('heightInput');
+        const weightRange = document.getElementById('weightRange');
+        const weightInput = document.getElementById('weightInput');
+        const heightVal = document.getElementById('heightVal');
+        const weightVal = document.getElementById('weightVal');
+        const resultEl = document.getElementById('result');
+        const bmiValue = document.getElementById('bmiValue');
+        const bmiLabel = document.getElementById('bmiLabel');
+        const bmiDesc = document.getElementById('bmiDesc');
+        const marker = document.getElementById('marker');
+
+        function syncHeight(v) {
+            v = Math.max(100, Math.min(250, v));
+            heightRange.value = Math.min(220, v);
+            heightInput.value = v;
+            heightVal.textContent = v;
+        }
+
+        function syncWeight(v) {
+            v = Math.max(10, Math.min(200, v));
+            weightRange.value = Math.min(150, v);
+            weightInput.value = v;
+            weightVal.textContent = v;
+        }
+
+        heightRange.addEventListener('input', () => syncHeight(+heightRange.value));
+        heightInput.addEventListener('input', () => syncHeight(+heightInput.value || 100));
+        weightRange.addEventListener('input', () => syncWeight(+weightRange.value));
+        weightInput.addEventListener('input', () => syncWeight(+weightInput.value || 10));
+
+        function getCategory(bmi) {
+            return CATEGORIES.find(c => bmi < c.max) || CATEGORIES[CATEGORIES.length - 1];
+        }
+
+        function bmiToPercent(bmi) {
+            const min = 15, max = 40;
+            return Math.max(2, Math.min(98, ((bmi - min) / (max - min)) * 100));
+        }
+
+        function calculate() {
+            const h = +heightInput.value;
+            const w = +weightInput.value;
+            if (!h || !w || h < 50 || w < 5) return;
+
+            const hm = h / 100;
+            const bmi = Math.round((w / (hm * hm)) * 10) / 10;
+            const cat = getCategory(bmi);
+
+            resultEl.className = 'result show ' + cat.cls;
+            bmiValue.textContent = bmi.toFixed(1);
+            bmiValue.style.color = cat.color;
+            bmiLabel.textContent = cat.label;
+            bmiLabel.style.color = cat.color;
+            bmiDesc.textContent = cat.desc;
+            marker.style.left = bmiToPercent(bmi) + '%';
+        }
+
+        document.getElementById('calcBtn').addEventListener('click', calculate);
+        [heightRange, weightRange, heightInput, weightInput].forEach(el => {
+            el.addEventListener('change', calculate);
+        });
+
+        calculate();
+    </script>
+</body>
+</html>

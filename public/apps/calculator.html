@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔢 เครื่องคิดเลข</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .wrap {
+            background: white;
+            border-radius: 28px;
+            padding: 28px 24px 24px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .hub-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #764ba2;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5em;
+            color: #764ba2;
+            margin-bottom: 16px;
+        }
+
+        .display-wrap {
+            background: #f8f9ff;
+            border: 2px solid #e0e4ff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: right;
+        }
+        .expression {
+            font-size: 0.85em;
+            color: #999;
+            min-height: 1.2em;
+            word-break: break-all;
+            margin-bottom: 4px;
+        }
+        .display {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #333;
+            word-break: break-all;
+            line-height: 1.2;
+        }
+
+        .keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .key {
+            border: none;
+            border-radius: 14px;
+            padding: 18px 8px;
+            font-family: inherit;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+        }
+        .key:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+        }
+
+        .num { background: #f0f0f5; color: #333; }
+        .num:hover { background: #e8e8f0; }
+
+        .op { background: #667eea; color: #fff; }
+        .op:hover { background: #5a6fd6; }
+        .op.active { background: #764ba2; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(2px); }
+
+        .fn { background: #ffd200; color: #333; font-size: 1.1em; }
+        .fn:hover { background: #f0c800; }
+
+        .eq {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: #fff;
+            grid-column: span 2;
+        }
+        .eq:hover { filter: brightness(1.05); }
+
+        .zero { grid-column: span 2; }
+
+        @media (max-width: 360px) {
+            .key { padding: 14px 6px; font-size: 1.15em; }
+            .display { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>🔢 เครื่องคิดเลข</h1>
+
+        <div class="display-wrap">
+            <div class="expression" id="expression"></div>
+            <div class="display" id="display">0</div>
+        </div>
+
+        <div class="keys">
+            <button class="key fn" data-action="clear">C</button>
+            <button class="key fn" data-action="back">⌫</button>
+            <button class="key fn" data-action="percent">%</button>
+            <button class="key op" data-op="÷">÷</button>
+
+            <button class="key num" data-num="7">7</button>
+            <button class="key num" data-num="8">8</button>
+            <button class="key num" data-num="9">9</button>
+            <button class="key op" data-op="×">×</button>
+
+            <button class="key num" data-num="4">4</button>
+            <button class="key num" data-num="5">5</button>
+            <button class="key num" data-num="6">6</button>
+            <button class="key op" data-op="-">−</button>
+
+            <button class="key num" data-num="1">1</button>
+            <button class="key num" data-num="2">2</button>
+            <button class="key num" data-num="3">3</button>
+            <button class="key op" data-op="+">+</button>
+
+            <button class="key num zero" data-num="0">0</button>
+            <button class="key num" data-num=".">.</button>
+            <button class="key eq" data-action="equals">=</button>
+        </div>
+    </div>
+
+    <script>
+        let current = '0';
+        let previous = '';
+        let operator = null;
+        let resetNext = false;
+
+        const displayEl = document.getElementById('display');
+        const expressionEl = document.getElementById('expression');
+
+        function updateDisplay() {
+            displayEl.textContent = formatNum(current);
+            if (previous && operator) {
+                expressionEl.textContent = `${formatNum(previous)} ${operator}`;
+            } else {
+                expressionEl.textContent = '';
+            }
+            document.querySelectorAll('.key.op').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.op === operator);
+            });
+        }
+
+        function formatNum(str) {
+            if (str === '' || str === '-') return str || '0';
+            if (str.endsWith('.')) return str;
+            const parts = str.split('.');
+            parts[0] = Number(parts[0]).toLocaleString('th-TH');
+            return parts.length > 1 ? parts[0] + '.' + parts[1] : parts[0];
+        }
+
+        function parseNum(str) {
+            return parseFloat(str.replace(/,/g, ''));
+        }
+
+        function inputNum(digit) {
+            if (resetNext) { current = ''; resetNext = false; }
+            if (digit === '.' && current.includes('.')) return;
+            if (current === '0' && digit !== '.') current = '';
+            current += digit;
+            if (current === '.') current = '0.';
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (operator && !resetNext) calculate();
+            previous = current;
+            operator = op;
+            resetNext = true;
+            updateDisplay();
+        }
+
+        function calculate() {
+            if (!operator || previous === '') return;
+            const a = parseNum(previous);
+            const b = parseNum(current);
+            let result;
+            switch (operator) {
+                case '+': result = a + b; break;
+                case '-': result = a - b; break;
+                case '×': result = a * b; break;
+                case '÷': result = b === 0 ? 'Error' : a / b; break;
+            }
+            if (result === 'Error') {
+                current = 'Error';
+            } else {
+                current = String(Math.round(result * 1e10) / 1e10);
+            }
+            expressionEl.textContent = `${formatNum(previous)} ${operator} ${formatNum(String(b))} =`;
+            previous = '';
+            operator = null;
+            resetNext = true;
+            displayEl.textContent = current === 'Error' ? 'Error' : formatNum(current);
+            document.querySelectorAll('.key.op').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function clearAll() {
+            current = '0';
+            previous = '';
+            operator = null;
+            resetNext = false;
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (resetNext || current === 'Error') { clearAll(); return; }
+            current = current.slice(0, -1) || '0';
+            updateDisplay();
+        }
+
+        function percent() {
+            if (current === 'Error') return;
+            current = String(parseNum(current) / 100);
+            updateDisplay();
+        }
+
+        document.querySelectorAll('.key').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.num != null) inputNum(btn.dataset.num);
+                else if (btn.dataset.op) setOperator(btn.dataset.op);
+                else if (btn.dataset.action === 'equals') calculate();
+                else if (btn.dataset.action === 'clear') clearAll();
+                else if (btn.dataset.action === 'back') backspace();
+                else if (btn.dataset.action === 'percent') percent();
+            });
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key >= '0' && e.key <= '9') inputNum(e.key);
+            else if (e.key === '.') inputNum('.');
+            else if (e.key === '+') setOperator('+');
+            else if (e.key === '-') setOperator('-');
+            else if (e.key === '*') setOperator('×');
+            else if (e.key === '/') { e.preventDefault(); setOperator('÷'); }
+            else if (e.key === 'Enter' || e.key === '=') calculate();
+            else if (e.key === 'Escape') clearAll();
+            else if (e.key === 'Backspace') backspace();
+        });
+    </script>
+</body>
+</html>

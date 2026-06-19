@@ -3,232 +3,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MilinHub</title>
+    <title>MilinHub — แดชบอร์ด</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: #0f0c29;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-            overflow-x: hidden;
+            color: #fff;
         }
 
-        /* Animated background particles */
-        .bg-animation {
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(255,255,255,0.04);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .bg-animation span {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 15s infinite;
-        }
-        .bg-animation span:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-delay: 0s; animation-duration: 12s; }
-        .bg-animation span:nth-child(2) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 18s; }
-        .bg-animation span:nth-child(3) { left: 35%; width: 25px; height: 25px; animation-delay: 4s; animation-duration: 14s; }
-        .bg-animation span:nth-child(4) { left: 50%; width: 12px; height: 12px; animation-delay: 1s; animation-duration: 16s; }
-        .bg-animation span:nth-child(5) { left: 65%; width: 18px; height: 18px; animation-delay: 3s; animation-duration: 20s; }
-        .bg-animation span:nth-child(6) { left: 80%; width: 22px; height: 22px; animation-delay: 5s; animation-duration: 13s; }
-        .bg-animation span:nth-child(7) { left: 90%; width: 14px; height: 14px; animation-delay: 6s; animation-duration: 17s; }
-        .bg-animation span:nth-child(8) { left: 45%; width: 16px; height: 16px; animation-delay: 7s; animation-duration: 15s; }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+            bottom: 0;
+            z-index: 10;
         }
 
-        .content {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 900px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
         }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInDown 0.8s ease;
+        .brand-icon {
+            font-size: 2.2em;
+            line-height: 1;
         }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            font-size: 4em;
-            margin-bottom: 10px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        h1 {
-            color: #fff;
-            font-size: 2.8em;
+        .brand-text h1 {
+            font-size: 1.35em;
             font-weight: 700;
-            background: linear-gradient(90deg, #f093fb, #f5576c, #4facfe, #00f2fe);
-            background-size: 300% 300%;
+            background: linear-gradient(90deg, #f093fb, #4facfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientShift 4s ease infinite;
         }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .brand-text p {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.45);
         }
 
-        .subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.3em;
-            margin-top: 10px;
-            letter-spacing: 2px;
+        .nav-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 10px;
+            padding-left: 12px;
         }
 
-        /* Cards grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 35px 30px;
-            text-align: center;
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.65);
             text-decoration: none;
+            font-size: 0.95em;
+            transition: background 0.2s, color 0.2s;
+            margin-bottom: 4px;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.08);
             color: #fff;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: fadeInUp 0.8s ease forwards;
-            opacity: 0;
-            position: relative;
-            overflow: hidden;
         }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s;
-        }
-        .card:hover::before {
-            left: 100%;
-        }
-        .card:nth-child(1) { animation-delay: 0.2s; }
-        .card:nth-child(2) { animation-delay: 0.4s; }
-        .card:nth-child(3) { animation-delay: 0.6s; }
-        .card:nth-child(4) { animation-delay: 0.8s; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-                        0 0 30px rgba(79, 172, 254, 0.2);
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            font-size: 0.78em;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
         }
 
-        .card-icon {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-        .card:hover .card-icon {
-            transform: scale(1.2) rotate(5deg);
+        /* Main */
+        .main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 28px 32px 40px;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(102,126,234,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(240,147,251,0.1) 0%, transparent 50%),
+                #0f0c29;
         }
 
-        .card-title {
+        /* Top bar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .welcome h2 {
             font-size: 1.6em;
             font-weight: 700;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #fff, #a8edea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .welcome p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.95em;
+        }
+        .date-badge {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 10px 18px;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
         }
 
-        .card-desc {
-            font-size: 1em;
-            color: rgba(255, 255, 255, 0.6);
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .stat-icon { font-size: 1.8em; margin-bottom: 8px; }
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 0.82em;
+            color: rgba(255,255,255,0.45);
+        }
+        .stat-card.math .stat-value { color: #4facfe; }
+        .stat-card.lang .stat-value { color: #f093fb; }
+        .stat-card.ai .stat-value { color: #43e97b; }
+        .stat-card.weather .stat-value { color: #56ccf2; }
+        .stat-card.creative .stat-value { color: #fd79a8; }
+        .stat-card.schedule .stat-value { color: #a29bfe; }
+        .stat-card.total .stat-value { color: #ffd200; }
+
+        /* Sections */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .section-header h3 {
+            font-size: 1.15em;
+            font-weight: 600;
+        }
+        .section-header span {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.4);
+        }
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .app-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 22px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .app-card.math::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .app-card.lang::before { background: linear-gradient(90deg, #f093fb, #f5576c); }
+        .app-card.ai::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+        .app-card.weather::before { background: linear-gradient(90deg, #56ccf2, #2f80ed); }
+        .app-card.creative::before { background: linear-gradient(90deg, #fd79a8, #e84393); }
+        .app-card.schedule::before { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .app-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .app-icon { font-size: 2.4em; }
+        .app-badge {
+            font-size: 0.7em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-math { background: rgba(79,172,254,0.15); color: #4facfe; }
+        .badge-lang { background: rgba(240,147,251,0.15); color: #f093fb; }
+        .badge-ai { background: rgba(67,233,123,0.15); color: #43e97b; }
+        .badge-creative { background: rgba(253,121,168,0.15); color: #fd79a8; }
+        .badge-schedule { background: rgba(162,155,254,0.15); color: #a29bfe; }
+        .badge-weather { background: rgba(86,204,242,0.15); color: #56ccf2; }
+
+        .app-title {
+            font-size: 1.15em;
+            font-weight: 700;
+        }
+        .app-desc {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.5);
             line-height: 1.5;
         }
+        .app-arrow {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.3);
+            margin-top: auto;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .app-card:hover .app-arrow {
+            color: rgba(255,255,255,0.7);
+            transform: translateX(4px);
+        }
 
-        /* Footer */
-        .footer {
-            margin-top: 60px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.9em;
-            animation: fadeInUp 1s ease forwards;
-            animation-delay: 1s;
-            opacity: 0;
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 20;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9;
+        }
+
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .overlay.open { display: block; }
+            .main {
+                margin-left: 0;
+                padding: 70px 20px 32px;
+            }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .welcome h2 { font-size: 1.3em; }
+        }
+
+        @media (max-width: 400px) {
+            .app-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span>
+    <button class="menu-toggle" id="menuToggle" aria-label="เปิดเมนู">☰</button>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon">🚀</div>
+                <div class="brand-text">
+                    <h1>MilinHub</h1>
+                    <p>แดชบอร์ดการเรียนรู้</p>
+                </div>
+            </div>
+
+            <div class="nav-label">หมวดหมู่</div>
+            <a href="#math" class="nav-item active" data-section="math">
+                <span class="dot" style="background:#4facfe"></span> คณิตศาสตร์
+            </a>
+            <a href="#language" class="nav-item" data-section="language">
+                <span class="dot" style="background:#f093fb"></span> ภาษา
+            </a>
+            <a href="#ai" class="nav-item" data-section="ai">
+                <span class="dot" style="background:#43e97b"></span> AI &amp; สนุก
+            </a>
+            <a href="#weather" class="nav-item" data-section="weather">
+                <span class="dot" style="background:#56ccf2"></span> สภาพอากาศ
+            </a>
+            <a href="#creative" class="nav-item" data-section="creative">
+                <span class="dot" style="background:#fd79a8"></span> สร้างสรรค์
+            </a>
+            <a href="#schedule" class="nav-item" data-section="schedule">
+                <span class="dot" style="background:#a29bfe"></span> จัดการเวลา
+            </a>
+
+            <div class="sidebar-footer">Made with ❤️ for learning</div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <div class="welcome">
+                    <h2 id="greeting">สวัสดี!</h2>
+                    <p>เลือกบทเรียนที่อยากเรียนวันนี้</p>
+                </div>
+                <div class="date-badge" id="dateDisplay"></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card total">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value">17</div>
+                    <div class="stat-label">บทเรียนทั้งหมด</div>
+                </div>
+                <div class="stat-card math">
+                    <div class="stat-icon">🔢</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">คณิตศาสตร์</div>
+                </div>
+                <div class="stat-card lang">
+                    <div class="stat-icon">🔤</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">ภาษา</div>
+                </div>
+                <div class="stat-card weather">
+                    <div class="stat-icon">🌤️</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">สภาพอากาศ</div>
+                </div>
+                <div class="stat-card ai">
+                    <div class="stat-icon">🤖</div>
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">AI &amp; สนุก</div>
+                </div>
+                <div class="stat-card creative">
+                    <div class="stat-icon">🎨</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">สร้างสรรค์</div>
+                </div>
+                <div class="stat-card schedule">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">จัดการเวลา</div>
+                </div>
+            </div>
+
+            <!-- Math -->
+            <section class="section" id="math">
+                <div class="section-header">
+                    <h3>🔢 คณิตศาสตร์</h3>
+                    <span>ฝึกคิดเลข แปลงหน่วย และสุขภาพ</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/multiplication-game" class="app-card math">
+                        <div class="app-top">
+                            <span class="app-icon">🎮</span>
+                            <span class="app-badge badge-math">คณิต</span>
+                        </div>
+                        <div class="app-title">ตารางสูตรคูณ</div>
+                        <div class="app-desc">ฝึกคูณ 1-12 แบบนันทนาการ</div>
+                        <div class="app-arrow">เริ่มเรียน →</div>
+                    </a>
+                    <a href="/apps/multiplication-trainer" class="app-card math">
+                        <div class="app-top">
+                            <span class="app-icon">🧠</span>
+                            <span class="app-badge badge-math">คณิต</span>
+                        </div>
+                        <div class="app-title">ฝึกคำนวณ</div>
+                        <div class="app-desc">บวก ลบ คูณ หาร แบบสุ่ม</div>
+                        <div class="app-arrow">เริ่มเรียน →</div>
+                    </a>
+                    <a href="/apps/calculator" class="app-card math">
+                        <div class="app-top">
+                            <span class="app-icon">🔢</span>
+                            <span class="app-badge badge-math">คณิต</span>
+                        </div>
+                        <div class="app-title">เครื่องคิดเลข</div>
+                        <div class="app-desc">บวก ลบ คูณ หาร ใช้งานง่าย</div>
+                        <div class="app-arrow">เปิดใช้ →</div>
+                    </a>
+                    <a href="/apps/bmi" class="app-card math">
+                        <div class="app-top">
+                            <span class="app-icon">⚖️</span>
+                            <span class="app-badge badge-math">สุขภาพ</span>
+                        </div>
+                        <div class="app-title">คำนวณ BMI</div>
+                        <div class="app-desc">ดัชนีมวลกาย ตรวจน้ำหนักส่วนสูง</div>
+                        <div class="app-arrow">คำนวณ →</div>
+                    </a>
+                    <a href="/apps/unit-converter" class="app-card math">
+                        <div class="app-top">
+                            <span class="app-icon">🔄</span>
+                            <span class="app-badge badge-math">Convert</span>
+                        </div>
+                        <div class="app-title">แปลงหน่วย</div>
+                        <div class="app-desc">ความยาว น้ำหนัก อุณหภูมิ และอื่นๆ</div>
+                        <div class="app-arrow">แปลง →</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Language -->
+            <section class="section" id="language">
+                <div class="section-header">
+                    <h3>🔤 ภาษา</h3>
+                    <span>ไทย อังกฤษ และเครื่องมือ</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/thai-consonants" class="app-card lang">
+                        <div class="app-top">
+                            <span class="app-icon">🔤</span>
+                            <span class="app-badge badge-lang">ไทย</span>
+                        </div>
+                        <div class="app-title">พยัญชนะ ก-ฮ</div>
+                        <div class="app-desc">เรียนรู้ 44 พยัญชนะไทย</div>
+                        <div class="app-arrow">เริ่มเรียน →</div>
+                    </a>
+                    <a href="/apps/thai-vowels" class="app-card lang">
+                        <div class="app-top">
+                            <span class="app-icon">🌈</span>
+                            <span class="app-badge badge-lang">ไทย</span>
+                        </div>
+                        <div class="app-title">สระภาษาไทย</div>
+                        <div class="app-desc">เรียนรู้สระและตัวอย่างคำ</div>
+                        <div class="app-arrow">เริ่มเรียน →</div>
+                    </a>
+                    <a href="/apps/english-alphabet" class="app-card lang">
+                        <div class="app-top">
+                            <span class="app-icon">🔠</span>
+                            <span class="app-badge badge-lang">EN</span>
+                        </div>
+                        <div class="app-title">A-Z</div>
+                        <div class="app-desc">เรียนรู้ตัวอักษรภาษาอังกฤษ</div>
+                        <div class="app-arrow">เริ่มเรียน →</div>
+                    </a>
+                    <a href="/apps/dictionary" class="app-card lang">
+                        <div class="app-top">
+                            <span class="app-icon">📖</span>
+                            <span class="app-badge badge-lang">TH↔EN</span>
+                        </div>
+                        <div class="app-title">พจนานุกรม</div>
+                        <div class="app-desc">ไทย-อังกฤษ อังกฤษ-ไทย</div>
+                        <div class="app-arrow">ค้นหาคำ →</div>
+                    </a>
+                    <a href="/apps/year-converter" class="app-card lang">
+                        <div class="app-top">
+                            <span class="app-icon">📅</span>
+                            <span class="app-badge badge-lang">TH</span>
+                        </div>
+                        <div class="app-title">แปลงปี พ.ศ. ↔ ค.ศ.</div>
+                        <div class="app-desc">พุทธศักราช ↔ คริสต์ศักราช</div>
+                        <div class="app-arrow">แปลงปี →</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- AI -->
+            <section class="section" id="ai">
+                <div class="section-header">
+                    <h3>🤖 AI &amp; สนุก</h3>
+                    <span>คุยและเล่นไปด้วยกัน</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/kid-chatbot" class="app-card ai">
+                        <div class="app-top">
+                            <span class="app-icon">🤖</span>
+                            <span class="app-badge badge-ai">AI</span>
+                        </div>
+                        <div class="app-title">คุยกับมิลลิ</div>
+                        <div class="app-desc">แชทบอทเพื่อนหุ่นยนต์สำหรับเด็ก</div>
+                        <div class="app-arrow">เริ่มคุย →</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Weather -->
+            <section class="section" id="weather">
+                <div class="section-header">
+                    <h3>🌤️ สภาพอากาศ</h3>
+                    <span>ตรวจสอบอากาศ ฝุ่น PM2.5 และพยากรณ์</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/weather" class="app-card weather">
+                        <div class="app-top">
+                            <span class="app-icon">🌤️</span>
+                            <span class="app-badge badge-weather">Weather</span>
+                        </div>
+                        <div class="app-title">ตรวจสอบสภาพอากาศ</div>
+                        <div class="app-desc">อากาศปัจจุบัน พยากรณ์รายชั่วโมงและรายวัน</div>
+                        <div class="app-arrow">ดูอากาศ →</div>
+                    </a>
+                    <a href="/apps/air-quality" class="app-card weather">
+                        <div class="app-top">
+                            <span class="app-icon">😷</span>
+                            <span class="app-badge badge-weather">PM2.5</span>
+                        </div>
+                        <div class="app-title">ค่าฝุ่น PM2.5</div>
+                        <div class="app-desc">ตรวจ PM2.5 พยากรณ์ 96 ชม. (Open-Meteo)</div>
+                        <div class="app-arrow">ดูฝุ่น →</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Creative -->
+            <section class="section" id="creative">
+                <div class="section-header">
+                    <h3>🎨 สร้างสรรค์</h3>
+                    <span>วาดภาพ จดบันทึก และเก็บไอเดีย</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/whiteboard" class="app-card creative">
+                        <div class="app-top">
+                            <span class="app-icon">🎨</span>
+                            <span class="app-badge badge-creative">Draw</span>
+                        </div>
+                        <div class="app-title">Whiteboard</div>
+                        <div class="app-desc">วาดภาพ สเก็ตช์ และบันทึกไอเดีย</div>
+                        <div class="app-arrow">เริ่มวาด →</div>
+                    </a>
+                    <a href="/apps/notes" class="app-card creative">
+                        <div class="app-top">
+                            <span class="app-icon">📝</span>
+                            <span class="app-badge badge-creative">Note</span>
+                        </div>
+                        <div class="app-title">สมุดโน้ต</div>
+                        <div class="app-desc">จดบันทึกไอเดียและเรื่องราว</div>
+                        <div class="app-arrow">เริ่มจด →</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Schedule -->
+            <section class="section" id="schedule">
+                <div class="section-header">
+                    <h3>📅 จัดการเวลา</h3>
+                    <span>ปฏิทิน Pomodoro และตารางกิจกรรม</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/calendar" class="app-card schedule">
+                        <div class="app-top">
+                            <span class="app-icon">📅</span>
+                            <span class="app-badge badge-schedule">Plan</span>
+                        </div>
+                        <div class="app-title">ปฏิทิน</div>
+                        <div class="app-desc">จัดการตารางและบันทึกกิจกรรม</div>
+                        <div class="app-arrow">เปิดปฏิทิน →</div>
+                    </a>
+                    <a href="/apps/pomodoro" class="app-card schedule">
+                        <div class="app-top">
+                            <span class="app-icon">🍅</span>
+                            <span class="app-badge badge-schedule">Focus</span>
+                        </div>
+                        <div class="app-title">Pomodoro Timer</div>
+                        <div class="app-desc">โฟกัสเรียน 25 นาที พักผ่อนเป็นระยะ</div>
+                        <div class="app-arrow">เริ่มโฟกัส →</div>
+                    </a>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <div class="content">
-        <div class="header">
-            <div class="logo">🚀</div>
-            <h1>MilinHub</h1>
-            <p class="subtitle">พื้นที่สําหรบการเรียนรู้</p>
-        </div>
+    <script>
+        const thaiDays = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+        const thaiMonths = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-        <div class="grid">
-            <a href="/apps/multiplication-game" class="card">
-                <div class="card-icon">🎮</div>
-                <div class="card-title">ตารางสูตรคูณ</div>
-                <div class="card-desc">ฝึกคูณ 1-12 แบบนันทนาการ</div>
-            </a>
+        const now = new Date();
+        const h = now.getHours();
+        let greet = 'สวัสดีตอนเย็น 🌆';
+        if (h < 12) greet = 'สวัสดีตอนเช้า ☀️';
+        else if (h < 17) greet = 'สวัสดีตอนบ่าย 🌤️';
+        else if (h >= 21) greet = 'สวัสดีตอนกลางคืน 🌙';
+        document.getElementById('greeting').textContent = greet;
 
-            <a href="/apps/multiplication-trainer" class="card">
-                <div class="card-icon">🧠</div>
-                <div class="card-title">ฝึกคํานวณ</div>
-                <div class="card-desc">ฝึกความเร็วในการคํานวณ</div>
-            </a>
+        const d = now.getDate();
+        const day = thaiDays[now.getDay()];
+        const month = thaiMonths[now.getMonth()];
+        const year = now.getFullYear() + 543;
+        document.getElementById('dateDisplay').textContent = `วัน${day} ${d} ${month} ${year}`;
 
-            <a href="/apps/kid-chatbot" class="card">
-                <div class="card-icon">🤖</div>
-                <div class="card-title">คุยกับมิลลิ</div>
-                <div class="card-desc">แชทบอทเพื่อนหุ่นยนต์สำหรับเด็ก</div>
-            </a>
-        </div>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuToggle = document.getElementById('menuToggle');
 
-        <div class="footer">
-            <p>Made with ❤️ for learning</p>
-        </div>
-    </div>
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+        });
+
+        const sections = document.querySelectorAll('.section');
+        const navItems = document.querySelectorAll('.nav-item');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navItems.forEach(n => n.classList.toggle('active', n.dataset.section === entry.target.id));
+                }
+            });
+        }, { rootMargin: '-30% 0px -60% 0px' });
+        sections.forEach(s => observer.observe(s));
+    </script>
 </body>
 </html>

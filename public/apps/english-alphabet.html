@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔠 A-Z</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .wrap { max-width: 900px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.95em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .hub-link:hover { text-decoration: underline; }
+        h1 {
+            color: #fff;
+            font-size: 2.2em;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.92);
+            margin-bottom: 20px;
+        }
+        .detail {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            text-align: center;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-char {
+            font-size: 5em;
+            font-weight: 700;
+            color: #11998e;
+            line-height: 1;
+        }
+        .detail-name {
+            font-size: 1.6em;
+            color: #555;
+            margin: 8px 0;
+        }
+        .detail-word {
+            font-size: 1.2em;
+            color: #888;
+        }
+        .speak-btn {
+            margin-top: 14px;
+            background: linear-gradient(135deg, #11998e, #0d7a6f);
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .speak-btn:hover { transform: scale(1.05); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 10px;
+        }
+        .letter-btn {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 16px;
+            font-size: 2em;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .letter-btn:hover { transform: translateY(-3px); }
+        .letter-btn.active {
+            outline: 4px solid #fff;
+            transform: scale(1.08);
+        }
+        .c1{background:#e74c3c}.c2{background:#e67e22}.c3{background:#f1c40f;color:#333}
+        .c4{background:#2ecc71}.c5{background:#1abc9c}.c6{background:#3498db}
+        .c7{background:#9b59b6}.c8{background:#e91e63}.c9{background:#00bcd4}
+        .c10{background:#ff5722}.c11{background:#795548}
+        @media (max-width:480px) {
+            .detail-char { font-size: 3.5em; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); }
+            .letter-btn { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>🔠 A-Z</h1>
+        <p class="subtitle">เรียนรู้ตัวอักษรภาษาอังกฤษ แตะเพื่อฟังเสียง</p>
+
+        <div class="detail" id="detail">
+            <div class="detail-char" id="dChar">A</div>
+            <div class="detail-name" id="dName">A for Apple</div>
+            <div class="detail-word" id="dWord">แอปเปิ้ล 🍎</div>
+            <button class="speak-btn" onclick="speakCurrent()">🔊 ฟังเสียง</button>
+        </div>
+
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <script>
+        const letters = [
+            { char: 'A', name: 'A for Apple', word: 'Apple', thai: 'แอปเปิ้ล', emoji: '🍎' },
+            { char: 'B', name: 'B for Ball', word: 'Ball', thai: 'ลูกบอล', emoji: '⚽' },
+            { char: 'C', name: 'C for Cat', word: 'Cat', thai: 'แมว', emoji: '🐱' },
+            { char: 'D', name: 'D for Dog', word: 'Dog', thai: 'สุนัข', emoji: '🐶' },
+            { char: 'E', name: 'E for Elephant', word: 'Elephant', thai: 'ช้าง', emoji: '🐘' },
+            { char: 'F', name: 'F for Fish', word: 'Fish', thai: 'ปลา', emoji: '🐟' },
+            { char: 'G', name: 'G for Grapes', word: 'Grapes', thai: 'องุ่น', emoji: '🍇' },
+            { char: 'H', name: 'H for House', word: 'House', thai: 'บ้าน', emoji: '🏠' },
+            { char: 'I', name: 'I for Ice cream', word: 'Ice cream', thai: 'ไอศกรีม', emoji: '🍦' },
+            { char: 'J', name: 'J for Juice', word: 'Juice', thai: 'น้ำผลไม้', emoji: '🧃' },
+            { char: 'K', name: 'K for Kite', word: 'Kite', thai: 'ว่าว', emoji: '🪁' },
+            { char: 'L', name: 'L for Lion', word: 'Lion', thai: 'สิงโต', emoji: '🦁' },
+            { char: 'M', name: 'M for Monkey', word: 'Monkey', thai: 'ลิง', emoji: '🐒' },
+            { char: 'N', name: 'N for Nest', word: 'Nest', thai: 'รังนก', emoji: '🪺' },
+            { char: 'O', name: 'O for Orange', word: 'Orange', thai: 'ส้ม', emoji: '🍊' },
+            { char: 'P', name: 'P for Penguin', word: 'Penguin', thai: 'เพนกวิน', emoji: '🐧' },
+            { char: 'Q', name: 'Q for Queen', word: 'Queen', thai: 'ราชินี', emoji: '👸' },
+            { char: 'R', name: 'R for Rabbit', word: 'Rabbit', thai: 'กระต่าย', emoji: '🐰' },
+            { char: 'S', name: 'S for Sun', word: 'Sun', thai: 'พระอาทิตย์', emoji: '☀️' },
+            { char: 'T', name: 'T for Tiger', word: 'Tiger', thai: 'เสือ', emoji: '🐯' },
+            { char: 'U', name: 'U for Umbrella', word: 'Umbrella', thai: 'ร่ม', emoji: '☂️' },
+            { char: 'V', name: 'V for Violin', word: 'Violin', thai: 'ไวโอลิน', emoji: '🎻' },
+            { char: 'W', name: 'W for Watermelon', word: 'Watermelon', thai: 'แตงโม', emoji: '🍉' },
+            { char: 'X', name: 'X for X-ray', word: 'X-ray', thai: 'เอ็กซ์เรย์', emoji: '🩻' },
+            { char: 'Y', name: 'Y for Yacht', word: 'Yacht', thai: 'เรือยอชต์', emoji: '🛥️' },
+            { char: 'Z', name: 'Z for Zebra', word: 'Zebra', thai: 'ม้าลาย', emoji: '🦓' },
+        ];
+
+        let current = 0;
+        const grid = document.getElementById('grid');
+
+        letters.forEach((l, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn c' + ((i % 11) + 1);
+            btn.textContent = l.char;
+            btn.onclick = () => selectLetter(i);
+            grid.appendChild(btn);
+        });
+
+        function selectLetter(i) {
+            current = i;
+            const l = letters[i];
+            document.getElementById('dChar').textContent = l.char;
+            document.getElementById('dName').textContent = l.name;
+            document.getElementById('dWord').textContent = l.thai + ' ' + l.emoji;
+            document.querySelectorAll('.letter-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+            speak(l.name);
+        }
+
+        function speak(text) {
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US';
+            u.rate = 0.85;
+            speechSynthesis.speak(u);
+        }
+
+        function speakCurrent() {
+            speak(letters[current].name);
+        }
+
+        selectLetter(0);
+    </script>
+</body>
+</html>

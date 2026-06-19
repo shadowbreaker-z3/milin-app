@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌟 ฝึกลบเลขคูน 🌟</title>
+    <title>🌟 ฝึกคำนวณ 🌟</title>
     <style>
         * {
             margin: 0;
@@ -366,11 +366,11 @@
 
         <!-- Settings Screen -->
         <div id="settings-screen">
-            <h1>🌟 ฝึกลบเลขคูน 🌟</h1>
-            <p class="subtitle">เรียนเลขคูนอย่างสนุก!</p>
+            <h1>🌟 ฝึกคำนวณ 🌟</h1>
+            <p class="subtitle">บวก ลบ คูณ หาร แบบสุ่ม!</p>
 
             <div class="settings">
-                <h2>📚 เลือกตารางเลขที่อยากฝึก</h2>
+                <h2>📚 เลือกช่วงตัวเลข</h2>
                 <div class="range-group">
                     <label>จาก:</label>
                     <select id="from-select">
@@ -432,7 +432,7 @@
             </div>
 
             <div class="question-box" id="question-box">
-                <span id="num1">3</span> × <span id="num2">7</span> = ?
+                <span id="num1">3</span> <span id="operator">×</span> <span id="num2">7</span> = ?
             </div>
 
             <input type="number" class="answer-input" id="answer-input"
@@ -471,7 +471,7 @@
 
             <button class="start-btn" onclick="startGame()">🔄 ฝึกอีกครั้ง</button>
             <br>
-            <button class="back-btn" onclick="goHome()">⬅️ เปลี่ยนตารางเลข</button>
+            <button class="back-btn" onclick="goHome()">⬅️ เปลี่ยนการตั้งค่า</button>
         </div>
     </div>
 
@@ -508,13 +508,44 @@
         ];
 
         // --- Functions ---
-        function shuffle(arr) {
-            const a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
+        function rand(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateQuestion(from, to) {
+            const ops = ['+', '-', '×', '÷'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            let a, b, answer;
+
+            switch (op) {
+                case '+':
+                    a = rand(from, to);
+                    b = rand(from, to);
+                    answer = a + b;
+                    break;
+                case '-':
+                    a = rand(from, to);
+                    b = rand(from, to);
+                    if (a < b) [a, b] = [b, a];
+                    answer = a - b;
+                    break;
+                case '×':
+                    a = rand(from, to);
+                    b = rand(from, to);
+                    answer = a * b;
+                    break;
+                case '÷':
+                    b = rand(Math.max(from, 1), to);
+                    answer = rand(from, to);
+                    a = b * answer;
+                    break;
             }
-            return a;
+
+            return { a, b, op, answer };
+        }
+
+        function formatQuestion(q) {
+            return q.a + ' ' + q.op + ' ' + q.b;
         }
 
         function startGame() {
@@ -527,16 +558,7 @@
                 return;
             }
 
-            // Generate all possible questions
-            const allQuestions = [];
-            for (let i = from; i <= to; i++) {
-                for (let j = 1; j <= 12; j++) {
-                    allQuestions.push({ a: i, b: j, answer: i * j });
-                }
-            }
-
-            // Shuffle and pick
-            questions = shuffle(allQuestions).slice(0, Math.min(count, allQuestions.length));
+            questions = Array.from({ length: count }, () => generateQuestion(from, to));
             currentQ = 0;
             correctCount = 0;
             wrongCount = 0;
@@ -555,6 +577,7 @@
             answered = false;
             const q = questions[currentQ];
             document.getElementById('num1').textContent = q.a;
+            document.getElementById('operator').textContent = q.op;
             document.getElementById('num2').textContent = q.b;
             document.getElementById('answer-input').value = '';
             document.getElementById('answer-input').className = 'answer-input';
@@ -614,7 +637,7 @@
                 setTimeout(() => input.classList.remove('shake'), 500);
 
                 wrongAnswers.push({
-                    question: q.a + ' × ' + q.b,
+                    question: formatQuestion(q),
                     correct: q.answer,
                     user: userAnswer
                 });

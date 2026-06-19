@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌤️ สภาพอากาศ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: linear-gradient(160deg, #1e3c72 0%, #2a5298 40%, #7ec8e3 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .wrap { max-width: 720px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.95em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+        h1 { text-align: center; font-size: 2em; margin-bottom: 4px; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 20px; font-size: 0.95em; }
+
+        .search-bar {
+            display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .search-bar input {
+            flex: 1; min-width: 160px;
+            padding: 12px 16px; border: none; border-radius: 14px;
+            font-family: inherit; font-size: 1em; outline: none;
+        }
+        .search-bar button {
+            padding: 12px 18px; border: none; border-radius: 14px;
+            font-family: inherit; font-size: 0.95em; cursor: pointer;
+            background: rgba(255,255,255,0.2); color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .search-bar button.primary {
+            background: #fff; color: #1e3c72; font-weight: 600;
+        }
+        .search-bar button:hover { background: rgba(255,255,255,0.3); }
+        .search-bar button.primary:hover { background: #f0f4ff; }
+
+        .panel {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .current { text-align: center; }
+        .location-name { font-size: 1.3em; font-weight: 600; margin-bottom: 4px; }
+        .location-country { font-size: 0.85em; color: rgba(255,255,255,0.6); margin-bottom: 12px; }
+        .current-main {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .current-main img { width: 100px; height: 100px; }
+        .current-temp { font-size: 4.5em; font-weight: 700; line-height: 1; }
+        .current-desc { font-size: 1.2em; margin: 8px 0 16px; text-transform: capitalize; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+        }
+        .stat {
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 12px 8px; text-align: center;
+        }
+        .stat-icon { font-size: 1.3em; }
+        .stat-val { font-size: 1.1em; font-weight: 700; margin: 4px 0 2px; }
+        .stat-lbl { font-size: 0.72em; color: rgba(255,255,255,0.6); }
+
+        .section-title {
+            font-size: 1em; font-weight: 600; margin-bottom: 12px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .hourly-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .hour-item {
+            flex-shrink: 0; background: rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 12px 14px; text-align: center; min-width: 72px;
+        }
+        .hour-time { font-size: 0.8em; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
+        .hour-item img { width: 40px; height: 40px; }
+        .hour-temp { font-weight: 700; font-size: 0.95em; }
+
+        .daily-list { display: flex; flex-direction: column; gap: 8px; }
+        .day-row {
+            display: grid; grid-template-columns: 80px 1fr 60px 80px;
+            align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 10px 14px;
+        }
+        .day-name { font-weight: 600; font-size: 0.9em; }
+        .day-icon { display: flex; align-items: center; gap: 6px; font-size: 0.85em; color: rgba(255,255,255,0.7); }
+        .day-icon img { width: 36px; height: 36px; }
+        .day-pop { text-align: center; font-size: 0.8em; color: #a8d8ff; }
+        .day-temps { text-align: right; font-size: 0.9em; }
+        .day-temps .max { font-weight: 700; }
+        .day-temps .min { color: rgba(255,255,255,0.55); margin-left: 6px; }
+
+        .alert-box {
+            background: rgba(231,76,60,0.25);
+            border: 1px solid rgba(231,76,60,0.5);
+            border-radius: 14px; padding: 14px; margin-bottom: 16px;
+            font-size: 0.9em;
+        }
+
+        .loading, .error-box {
+            text-align: center; padding: 60px 20px;
+            font-size: 1.1em; color: rgba(255,255,255,0.8);
+        }
+        .error-box { color: #ffcdd2; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #content { display: none; }
+
+        @media (max-width: 520px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .current-temp { font-size: 3.2em; }
+            .day-row { grid-template-columns: 70px 1fr 50px 70px; font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>🌤️ สภาพอากาศ</h1>
+        <p class="subtitle">ตรวจสอบอากาศวันนี้และพยากรณ์ล่วงหน้า</p>
+
+        <div class="search-bar">
+            <input type="text" id="cityInput" placeholder="ค้นหาเมือง เช่น Bangkok, Chiang Mai">
+            <button class="primary" onclick="searchCity()">🔍 ค้นหา</button>
+            <button onclick="useMyLocation()">📍 ตำแหน่งฉัน</button>
+        </div>
+
+        <div id="status">
+            <div class="loading">
+                <div class="spinner"></div>
+                กำลังโหลดข้อมูล...
+            </div>
+        </div>
+
+        <div id="content">
+            <div id="alerts"></div>
+
+            <div class="panel current">
+                <div class="location-name" id="locName"></div>
+                <div class="location-country" id="locCountry"></div>
+                <div class="current-main">
+                    <img id="curIcon" src="" alt="">
+                    <div class="current-temp" id="curTemp"></div>
+                </div>
+                <div class="current-desc" id="curDesc"></div>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <div class="stat-icon">🌡️</div>
+                        <div class="stat-val" id="feelsLike"></div>
+                        <div class="stat-lbl">รู้สึกเหมือน</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-val" id="humidity"></div>
+                        <div class="stat-lbl">ความชื้น</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">💨</div>
+                        <div class="stat-val" id="wind"></div>
+                        <div class="stat-lbl">ลม (m/s)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">☀️</div>
+                        <div class="stat-val" id="uvi"></div>
+                        <div class="stat-lbl">UV Index</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title">⏰ พยากรณ์รายชั่วโมง</div>
+                <div class="hourly-scroll" id="hourly"></div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title">📅 พยากรณ์รายวัน</div>
+                <div class="daily-list" id="daily"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const thaiDays = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+        const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+        function showLoading(msg = 'กำลังโหลดข้อมูล...') {
+            document.getElementById('status').innerHTML =
+                `<div class="loading"><div class="spinner"></div>${msg}</div>`;
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function showError(msg) {
+            document.getElementById('status').innerHTML =
+                `<div class="error-box">❌ ${msg}</div>`;
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function fmtHour(ts, tzOffset) {
+            const d = new Date((ts + tzOffset) * 1000);
+            return d.getUTCHours().toString().padStart(2, '0') + ':00';
+        }
+
+        function fmtDay(ts, tzOffset) {
+            const d = new Date((ts + tzOffset) * 1000);
+            const today = new Date();
+            const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+            const dayUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+            if (dayUTC === todayUTC) return 'วันนี้';
+            const tomorrowUTC = todayUTC + 86400000;
+            if (dayUTC === tomorrowUTC) return 'พรุ่งนี้';
+            return thaiDays[d.getUTCDay()];
+        }
+
+        function render(data) {
+            const weather = data.weather;
+            const cur = weather.current;
+            if (!cur) throw new Error('ไม่มีข้อมูลสภาพอากาศปัจจุบัน');
+
+            const tz = weather.timezone_offset || 0;
+            const w = cur.weather?.[0] || {};
+
+            document.getElementById('locName').textContent = data.location.name;
+            document.getElementById('locCountry').textContent = data.location.country;
+            document.getElementById('curIcon').src = iconUrl(w.icon || '01d');
+            document.getElementById('curIcon').alt = w.description || '';
+            document.getElementById('curTemp').textContent = Math.round(cur.temp) + '°';
+            document.getElementById('curDesc').textContent = w.description || '';
+            document.getElementById('feelsLike').textContent = Math.round(cur.feels_like) + '°';
+            document.getElementById('humidity').textContent = cur.humidity + '%';
+            document.getElementById('wind').textContent = cur.wind_speed?.toFixed(1) ?? '-';
+            document.getElementById('uvi').textContent = cur.uvi?.toFixed(1) ?? '-';
+
+            const alertsEl = document.getElementById('alerts');
+            if (weather.alerts?.length) {
+                const first = weather.alerts[0];
+                alertsEl.innerHTML = `<div class="alert-box">⚠️ <strong>${first.event}</strong><br>${first.description?.slice(0, 200)}${first.description?.length > 200 ? '...' : ''}</div>`;
+            } else {
+                alertsEl.innerHTML = '';
+            }
+
+            const hourlyEl = document.getElementById('hourly');
+            hourlyEl.innerHTML = '';
+            (weather.hourly || []).slice(0, 12).forEach(h => {
+                const hw = h.weather?.[0] || {};
+                hourlyEl.innerHTML += `
+                    <div class="hour-item">
+                        <div class="hour-time">${fmtHour(h.dt, tz)}</div>
+                        <img src="${iconUrl(hw.icon || '01d')}" alt="">
+                        <div class="hour-temp">${Math.round(h.temp)}°</div>
+                    </div>`;
+            });
+
+            const dailyEl = document.getElementById('daily');
+            dailyEl.innerHTML = '';
+            (weather.daily || []).slice(0, 7).forEach(d => {
+                const dw = d.weather?.[0] || {};
+                const pop = Math.round((d.pop || 0) * 100);
+                dailyEl.innerHTML += `
+                    <div class="day-row">
+                        <div class="day-name">${fmtDay(d.dt, tz)}</div>
+                        <div class="day-icon">
+                            <img src="${iconUrl(dw.icon || '01d')}" alt="">
+                            <span>${dw.description || ''}</span>
+                        </div>
+                        <div class="day-pop">${pop > 0 ? '💧' + pop + '%' : ''}</div>
+                        <div class="day-temps">
+                            <span class="max">${Math.round(d.temp.max)}°</span>
+                            <span class="min">${Math.round(d.temp.min)}°</span>
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        async function fetchWeather(params) {
+            showLoading();
+            try {
+                const qs = new URLSearchParams(params).toString();
+                const res = await fetch('/api/weather?' + qs);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+                render(data);
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        function searchCity() {
+            const q = document.getElementById('cityInput').value.trim();
+            if (!q) return;
+            fetchWeather({ q });
+        }
+
+        function useMyLocation() {
+            if (!navigator.geolocation) {
+                showError('เบราว์เซอร์ไม่รองรับ GPS');
+                return;
+            }
+            showLoading('กำลังหาตำแหน่ง...');
+            navigator.geolocation.getCurrentPosition(
+                pos => fetchWeather({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                () => showError('ไม่สามารถเข้าถึงตำแหน่งได้ ลองค้นหาเมืองแทน'),
+                { timeout: 10000 }
+            );
+        }
+
+        document.getElementById('cityInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') searchCity();
+        });
+
+        fetchWeather({ q: 'Bangkok,TH' });
+    </script>
+</body>
+</html>

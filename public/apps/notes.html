@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 สมุดโน้ต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            background: #0f0c29;
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .hub-link {
+            display: inline-block; padding: 12px 16px 0;
+            color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.9em;
+        }
+        .hub-link:hover { color: #fff; }
+
+        .layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 0;
+            min-height: 0;
+            height: calc(100vh - 36px);
+        }
+        @media (max-width: 720px) {
+            .layout { grid-template-columns: 1fr; height: auto; min-height: calc(100vh - 36px); }
+            .layout.show-editor .sidebar { display: none; }
+            .layout:not(.show-editor) .editor { display: none; }
+        }
+
+        .sidebar {
+            background: rgba(255,255,255,0.04);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            display: flex; flex-direction: column;
+            min-height: 0;
+        }
+        .sidebar-head {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-head h1 { font-size: 1.2em; font-weight: 700; margin-bottom: 2px; }
+        .sidebar-head p { font-size: 0.8em; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
+
+        .search-box {
+            width: 100%; padding: 9px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: #fff;
+            font-family: inherit; font-size: 0.88em;
+            outline: none; margin-bottom: 10px;
+        }
+        .search-box:focus { border-color: #fdcb6e; }
+        .search-box::placeholder { color: rgba(255,255,255,0.35); }
+
+        .btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff; border-radius: 10px;
+            padding: 9px 14px; font-family: inherit;
+            font-size: 0.85em; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn:hover { background: rgba(255,255,255,0.14); }
+        .btn.primary {
+            width: 100%;
+            background: linear-gradient(90deg, #fdcb6e, #f39c12);
+            border-color: transparent; color: #1a1200; font-weight: 600;
+        }
+        .btn.primary:hover { opacity: 0.92; }
+        .btn.danger { background: rgba(255,107,107,0.15); border-color: rgba(255,107,107,0.3); color: #ff6b6b; }
+        .btn.sm { padding: 6px 10px; font-size: 0.78em; }
+
+        .note-list {
+            flex: 1; overflow-y: auto;
+            padding: 8px;
+        }
+        .note-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+        }
+        .note-item:hover { background: rgba(255,255,255,0.06); }
+        .note-item.active {
+            background: rgba(253,203,110,0.12);
+            border-color: rgba(253,203,110,0.3);
+        }
+        .note-item.pinned .note-title::before { content: '📌 '; }
+        .note-title {
+            font-weight: 600; font-size: 0.92em;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+        .note-preview {
+            font-size: 0.78em; color: rgba(255,255,255,0.45);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .note-date { font-size: 0.72em; color: rgba(255,255,255,0.3); margin-top: 4px; }
+        .empty-list {
+            text-align: center; padding: 32px 16px;
+            color: rgba(255,255,255,0.35); font-size: 0.88em;
+        }
+
+        .editor {
+            display: flex; flex-direction: column;
+            min-height: 0; padding: 16px 20px;
+        }
+        .editor-toolbar {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .editor-toolbar .spacer { flex: 1; }
+        .save-hint {
+            font-size: 0.78em; color: rgba(255,255,255,0.35);
+        }
+        .save-hint.saved { color: #55efc4; }
+
+        .title-input {
+            width: 100%; background: transparent; border: none;
+            color: #fff; font-family: inherit;
+            font-size: 1.5em; font-weight: 700;
+            outline: none; margin-bottom: 12px;
+            padding: 4px 0;
+        }
+        .title-input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .content-input {
+            flex: 1; width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            color: #fff; font-family: inherit;
+            font-size: 1em; line-height: 1.7;
+            padding: 18px 20px;
+            outline: none; resize: none;
+            min-height: 300px;
+        }
+        .content-input:focus { border-color: rgba(253,203,110,0.4); }
+        .content-input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .editor-empty {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.3); gap: 12px;
+        }
+        .editor-empty span { font-size: 3em; }
+        .editor-empty p { font-size: 0.95em; }
+
+        .back-btn { display: none; }
+        @media (max-width: 720px) {
+            .back-btn { display: inline-block; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="hub-link">← กลับ MilinHub</a>
+
+    <div class="layout" id="layout">
+        <aside class="sidebar">
+            <div class="sidebar-head">
+                <h1>📝 สมุดโน้ต</h1>
+                <p>จดบันทึกไอเดียและเรื่องราว</p>
+                <input type="search" class="search-box" id="searchBox" placeholder="🔍 ค้นหาโน้ต...">
+                <button class="btn primary" id="newBtn">+ โน้ตใหม่</button>
+            </div>
+            <div class="note-list" id="noteList"></div>
+        </aside>
+
+        <main class="editor" id="editorPanel">
+            <div class="editor-empty" id="editorEmpty">
+                <span>📝</span>
+                <p>เลือกโน้ต หรือกด <strong>+ โน้ตใหม่</strong></p>
+            </div>
+            <div id="editorForm" style="display:none; flex:1; flex-direction:column; min-height:0;">
+                <div class="editor-toolbar">
+                    <button class="btn sm back-btn" id="backBtn">← รายการ</button>
+                    <button class="btn sm" id="pinBtn" title="ปักหมุด">📌</button>
+                    <span class="spacer"></span>
+                    <span class="save-hint" id="saveHint">บันทึกอัตโนมัติ</span>
+                    <button class="btn sm danger" id="deleteBtn">🗑️ ลบ</button>
+                </div>
+                <input type="text" class="title-input" id="titleInput" placeholder="หัวข้อ..." maxlength="120">
+                <textarea class="content-input" id="contentInput" placeholder="เริ่มจดบันทึกที่นี่..."></textarea>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'milin_notes';
+        const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+        let notes = [];
+        let activeId = null;
+        let saveTimer = null;
+        let query = '';
+
+        const noteList = document.getElementById('noteList');
+        const editorEmpty = document.getElementById('editorEmpty');
+        const editorForm = document.getElementById('editorForm');
+        const titleInput = document.getElementById('titleInput');
+        const contentInput = document.getElementById('contentInput');
+        const saveHint = document.getElementById('saveHint');
+        const layout = document.getElementById('layout');
+
+        function load() {
+            try { notes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+            catch { notes = []; }
+        }
+
+        function persist() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        }
+
+        function uid() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+
+        function fmtDate(iso) {
+            const d = new Date(iso);
+            const now = new Date();
+            const sameDay = d.toDateString() === now.toDateString();
+            const time = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            if (sameDay) return `วันนี้ ${time}`;
+            return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear() + 543} ${time}`;
+        }
+
+        function preview(text) {
+            const line = (text || '').replace(/\n/g, ' ').trim();
+            return line.slice(0, 60) || 'ไม่มีเนื้อหา';
+        }
+
+        function defaultTitle(text) {
+            const line = (text || '').trim().split('\n')[0];
+            return line.slice(0, 40) || 'โน้ตใหม่';
+        }
+
+        function sortedNotes(list) {
+            return [...list].sort((a, b) => {
+                if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+                return new Date(b.updatedAt) - new Date(a.updatedAt);
+            });
+        }
+
+        function filteredNotes() {
+            if (!query) return sortedNotes(notes);
+            const q = query.toLowerCase();
+            return sortedNotes(notes.filter(n =>
+                (n.title || '').toLowerCase().includes(q) ||
+                (n.content || '').toLowerCase().includes(q)
+            ));
+        }
+
+        function renderList() {
+            const list = filteredNotes();
+            if (!list.length) {
+                noteList.innerHTML = query
+                    ? '<div class="empty-list">ไม่พบโน้ตที่ค้นหา</div>'
+                    : '<div class="empty-list">ยังไม่มีโน้ต<br>กด + โน้ตใหม่ เพื่อเริ่มจด</div>';
+                return;
+            }
+            noteList.innerHTML = list.map(n => `
+                <div class="note-item${n.id === activeId ? ' active' : ''}${n.pinned ? ' pinned' : ''}" data-id="${n.id}">
+                    <div class="note-title">${esc(n.title || 'โน้ตใหม่')}</div>
+                    <div class="note-preview">${esc(preview(n.content))}</div>
+                    <div class="note-date">${fmtDate(n.updatedAt)}</div>
+                </div>
+            `).join('');
+            noteList.querySelectorAll('.note-item').forEach(el => {
+                el.addEventListener('click', () => selectNote(el.dataset.id));
+            });
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        function selectNote(id) {
+            flushSave();
+            activeId = id;
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            editorEmpty.style.display = 'none';
+            editorForm.style.display = 'flex';
+            titleInput.value = note.title || '';
+            contentInput.value = note.content || '';
+            document.getElementById('pinBtn').textContent = note.pinned ? '📌' : '📍';
+            document.getElementById('pinBtn').style.opacity = note.pinned ? '1' : '0.5';
+            layout.classList.add('show-editor');
+            renderList();
+            titleInput.focus();
+        }
+
+        function showEmpty() {
+            activeId = null;
+            editorEmpty.style.display = 'flex';
+            editorForm.style.display = 'none';
+            layout.classList.remove('show-editor');
+            renderList();
+        }
+
+        function createNote() {
+            flushSave();
+            const note = {
+                id: uid(),
+                title: '',
+                content: '',
+                pinned: false,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
+            notes.unshift(note);
+            persist();
+            selectNote(note.id);
+        }
+
+        function getActive() {
+            return notes.find(n => n.id === activeId);
+        }
+
+        function scheduleSave() {
+            saveHint.textContent = 'กำลังบันทึก...';
+            saveHint.classList.remove('saved');
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(flushSave, 400);
+        }
+
+        function flushSave() {
+            clearTimeout(saveTimer);
+            const note = getActive();
+            if (!note) return;
+            const title = titleInput.value.trim();
+            const content = contentInput.value;
+            note.title = title || defaultTitle(content);
+            note.content = content;
+            note.updatedAt = new Date().toISOString();
+            persist();
+            saveHint.textContent = 'บันทึกแล้ว ✓';
+            saveHint.classList.add('saved');
+            renderList();
+        }
+
+        function deleteNote() {
+            if (!activeId || !confirm('ลบโน้ตนี้?')) return;
+            notes = notes.filter(n => n.id !== activeId);
+            persist();
+            showEmpty();
+        }
+
+        function togglePin() {
+            const note = getActive();
+            if (!note) return;
+            note.pinned = !note.pinned;
+            note.updatedAt = new Date().toISOString();
+            persist();
+            document.getElementById('pinBtn').textContent = note.pinned ? '📌' : '📍';
+            document.getElementById('pinBtn').style.opacity = note.pinned ? '1' : '0.5';
+            renderList();
+        }
+
+        document.getElementById('newBtn').addEventListener('click', createNote);
+        document.getElementById('deleteBtn').addEventListener('click', deleteNote);
+        document.getElementById('pinBtn').addEventListener('click', togglePin);
+        document.getElementById('backBtn').addEventListener('click', () => {
+            flushSave();
+            showEmpty();
+        });
+        document.getElementById('searchBox').addEventListener('input', e => {
+            query = e.target.value.trim();
+            renderList();
+        });
+        titleInput.addEventListener('input', scheduleSave);
+        contentInput.addEventListener('input', scheduleSave);
+
+        load();
+        renderList();
+        showEmpty();
+    </script>
+</body>
+</html>

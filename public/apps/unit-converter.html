@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 แปลงหน่วย</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .wrap { max-width: 520px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.95em;
+        }
+        .hub-link:hover { text-decoration: underline; }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 24px 22px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+        }
+        h1 {
+            text-align: center; font-size: 1.5em;
+            color: #0984e3; margin-bottom: 4px;
+        }
+        .subtitle {
+            text-align: center; font-size: 0.88em;
+            color: #888; margin-bottom: 18px;
+        }
+
+        .tabs {
+            display: flex; gap: 6px; overflow-x: auto;
+            padding-bottom: 4px; margin-bottom: 18px;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            flex-shrink: 0; padding: 8px 14px;
+            border: 2px solid #e8f4fd; border-radius: 12px;
+            background: #f8fbff; font-family: inherit;
+            font-size: 0.82em; cursor: pointer;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .tab.active {
+            background: #0984e3; border-color: #0984e3;
+            color: #fff; font-weight: 600;
+        }
+
+        .converter-box {
+            background: #f8fbff;
+            border: 2px solid #e8f4fd;
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .field { margin-bottom: 14px; }
+        .field label {
+            display: block; font-size: 0.8em;
+            font-weight: 600; color: #888; margin-bottom: 6px;
+        }
+        .field-row {
+            display: flex; gap: 8px; align-items: stretch;
+        }
+        .field-row input {
+            flex: 1; min-width: 0;
+            padding: 12px 14px;
+            border: 2px solid #e0eef8; border-radius: 12px;
+            font-family: inherit; font-size: 1.3em; font-weight: 600;
+            outline: none; color: #0984e3;
+        }
+        .field-row input:focus { border-color: #0984e3; }
+        .field-row select {
+            width: 130px; flex-shrink: 0;
+            padding: 10px 8px;
+            border: 2px solid #e0eef8; border-radius: 12px;
+            font-family: inherit; font-size: 0.85em;
+            background: #fff; outline: none; cursor: pointer;
+        }
+        .field-row select:focus { border-color: #0984e3; }
+
+        .swap-wrap { display: flex; justify-content: center; margin: 4px 0 14px; }
+        .swap-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 2px solid #0984e3; background: #fff;
+            font-size: 1.3em; cursor: pointer;
+            transition: transform 0.3s, background 0.2s;
+        }
+        .swap-btn:hover { background: #e8f4fd; }
+        .swap-btn.spin { transform: rotate(180deg); }
+
+        .result-display {
+            text-align: center; padding: 14px;
+            background: #fff; border-radius: 12px;
+            border: 2px dashed #bde0fe;
+            margin-top: 4px;
+        }
+        .result-display .val {
+            font-size: 1.8em; font-weight: 700; color: #0984e3;
+            word-break: break-all;
+        }
+        .result-display .unit-lbl {
+            font-size: 0.85em; color: #888; margin-top: 2px;
+        }
+
+        .quick-title {
+            font-size: 0.85em; font-weight: 600; color: #666;
+            margin: 18px 0 8px;
+        }
+        .quick-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .quick-btn {
+            background: #f8fbff; border: 1px solid #e0eef8;
+            border-radius: 12px; padding: 10px 12px;
+            font-family: inherit; font-size: 0.82em;
+            cursor: pointer; text-align: left;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .quick-btn:hover { border-color: #0984e3; background: #e8f4fd; }
+        .quick-btn strong { color: #0984e3; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+
+        <div class="card">
+            <h1>🔄 แปลงหน่วย</h1>
+            <p class="subtitle">ความยาว น้ำหนัก อุณหภูมิ และอื่นๆ</p>
+
+            <div class="tabs" id="tabs"></div>
+
+            <div class="converter-box">
+                <div class="field">
+                    <label>จาก</label>
+                    <div class="field-row">
+                        <input type="number" id="inputFrom" value="1" step="any" inputmode="decimal">
+                        <select id="selectFrom"></select>
+                    </div>
+                </div>
+
+                <div class="swap-wrap">
+                    <button class="swap-btn" id="swapBtn" title="สลับหน่วย">⇅</button>
+                </div>
+
+                <div class="field">
+                    <label>เป็น</label>
+                    <div class="field-row">
+                        <input type="number" id="inputTo" readonly tabindex="-1"
+                            style="background:#f0f7ff;color:#2d3436">
+                        <select id="selectTo"></select>
+                    </div>
+                </div>
+
+                <div class="result-display">
+                    <div class="val" id="resultText">—</div>
+                    <div class="unit-lbl" id="resultLabel"></div>
+                </div>
+            </div>
+
+            <div class="quick-title">⚡ ตัวอย่างด่วน</div>
+            <div class="quick-grid" id="quickGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const CATEGORIES = {
+            length: {
+                icon: '📏', label: 'ความยาว',
+                units: [
+                    { id: 'mm', name: 'มิลลิเมตร (mm)', factor: 0.001 },
+                    { id: 'cm', name: 'เซนติเมตร (cm)', factor: 0.01 },
+                    { id: 'm', name: 'เมตร (m)', factor: 1 },
+                    { id: 'km', name: 'กิโลเมตร (km)', factor: 1000 },
+                    { id: 'inch', name: 'นิ้ว (in)', factor: 0.0254 },
+                    { id: 'ft', name: 'ฟุต (ft)', factor: 0.3048 },
+                    { id: 'yd', name: 'หลา (yd)', factor: 0.9144 },
+                    { id: 'mi', name: 'ไมล์ (mi)', factor: 1609.344 },
+                ],
+                defaultFrom: 'm', defaultTo: 'cm',
+                quick: [
+                    { v: 1, from: 'm', to: 'cm', label: '1 m → cm' },
+                    { v: 1, from: 'km', to: 'm', label: '1 km → m' },
+                    { v: 100, from: 'cm', to: 'm', label: '100 cm → m' },
+                    { v: 1, from: 'inch', to: 'cm', label: '1 นิ้ว → cm' },
+                ],
+            },
+            weight: {
+                icon: '⚖️', label: 'น้ำหนัก',
+                units: [
+                    { id: 'mg', name: 'มิลลิกรัม (mg)', factor: 0.000001 },
+                    { id: 'g', name: 'กรัม (g)', factor: 0.001 },
+                    { id: 'kg', name: 'กิโลกรัม (kg)', factor: 1 },
+                    { id: 'ton', name: 'ตัน (t)', factor: 1000 },
+                    { id: 'oz', name: 'ออนซ์ (oz)', factor: 0.0283495 },
+                    { id: 'lb', name: 'ปอนด์ (lb)', factor: 0.453592 },
+                ],
+                defaultFrom: 'kg', defaultTo: 'g',
+                quick: [
+                    { v: 1, from: 'kg', to: 'g', label: '1 kg → g' },
+                    { v: 1000, from: 'g', to: 'kg', label: '1000 g → kg' },
+                    { v: 1, from: 'lb', to: 'kg', label: '1 lb → kg' },
+                    { v: 500, from: 'g', to: 'kg', label: '500 g → kg' },
+                ],
+            },
+            temperature: {
+                icon: '🌡️', label: 'อุณหภูมิ',
+                units: [
+                    { id: 'c', name: 'เซลเซียส (°C)' },
+                    { id: 'f', name: 'Fahrenheit (°F)' },
+                    { id: 'k', name: 'เคลวิน (K)' },
+                ],
+                defaultFrom: 'c', defaultTo: 'f',
+                quick: [
+                    { v: 0, from: 'c', to: 'f', label: '0°C → °F' },
+                    { v: 100, from: 'c', to: 'f', label: '100°C → °F' },
+                    { v: 37, from: 'c', to: 'f', label: '37°C → °F' },
+                    { v: 32, from: 'f', to: 'c', label: '32°F → °C' },
+                ],
+            },
+            volume: {
+                icon: '🧪', label: 'ปริมาตร',
+                units: [
+                    { id: 'ml', name: 'มิลลิลิตร (mL)', factor: 0.001 },
+                    { id: 'l', name: 'ลิตร (L)', factor: 1 },
+                    { id: 'cup', name: 'ถ้วย (cup)', factor: 0.236588 },
+                    { id: 'gal', name: 'แกลลอน (gal)', factor: 3.78541 },
+                    { id: 'm3', name: 'ลูกบาศก์เมตร (m³)', factor: 1000 },
+                ],
+                defaultFrom: 'l', defaultTo: 'ml',
+                quick: [
+                    { v: 1, from: 'l', to: 'ml', label: '1 L → mL' },
+                    { v: 1000, from: 'ml', to: 'l', label: '1000 mL → L' },
+                    { v: 1, from: 'gal', to: 'l', label: '1 gal → L' },
+                    { v: 2, from: 'cup', to: 'ml', label: '2 cup → mL' },
+                ],
+            },
+            area: {
+                icon: '📐', label: 'พื้นที่',
+                units: [
+                    { id: 'sqm', name: 'ตารางเมตร (m²)', factor: 1 },
+                    { id: 'sqkm', name: 'ตารางกิโลเมตร (km²)', factor: 1000000 },
+                    { id: 'sqwa', name: 'ตารางวา (wa²)', factor: 4 },
+                    { id: 'ngan', name: 'งาน', factor: 400 },
+                    { id: 'rai', name: 'ไร่', factor: 1600 },
+                    { id: 'ha', name: 'เฮกตาร์ (ha)', factor: 10000 },
+                    { id: 'acre', name: 'เอเคอร์ (acre)', factor: 4046.86 },
+                ],
+                defaultFrom: 'rai', defaultTo: 'sqm',
+                quick: [
+                    { v: 1, from: 'rai', to: 'sqm', label: '1 ไร่ → m²' },
+                    { v: 1, from: 'ngan', to: 'sqm', label: '1 งาน → m²' },
+                    { v: 1, from: 'sqwa', to: 'sqm', label: '1 ตร.วา → m²' },
+                    { v: 1, from: 'ha', to: 'rai', label: '1 ha → ไร่' },
+                ],
+            },
+            time: {
+                icon: '⏱️', label: 'เวลา',
+                units: [
+                    { id: 'sec', name: 'วินาที (s)', factor: 1 },
+                    { id: 'min', name: 'นาที (min)', factor: 60 },
+                    { id: 'hr', name: 'ชั่วโมง (hr)', factor: 3600 },
+                    { id: 'day', name: 'วัน (day)', factor: 86400 },
+                    { id: 'week', name: 'สัปดาห์ (week)', factor: 604800 },
+                    { id: 'month', name: 'เดือน (30 วัน)', factor: 2592000 },
+                    { id: 'year', name: 'ปี (365 วัน)', factor: 31536000 },
+                ],
+                defaultFrom: 'hr', defaultTo: 'min',
+                quick: [
+                    { v: 1, from: 'hr', to: 'min', label: '1 ชม. → นาที' },
+                    { v: 60, from: 'min', to: 'hr', label: '60 นาที → ชม.' },
+                    { v: 1, from: 'day', to: 'hr', label: '1 วัน → ชม.' },
+                    { v: 1, from: 'week', to: 'day', label: '1 สัปดาห์ → วัน' },
+                ],
+            },
+        };
+
+        let currentCat = 'length';
+
+        const tabsEl = document.getElementById('tabs');
+        const selectFrom = document.getElementById('selectFrom');
+        const selectTo = document.getElementById('selectTo');
+        const inputFrom = document.getElementById('inputFrom');
+        const inputTo = document.getElementById('inputTo');
+        const resultText = document.getElementById('resultText');
+        const resultLabel = document.getElementById('resultLabel');
+        const quickGrid = document.getElementById('quickGrid');
+
+        function fmt(n) {
+            if (!isFinite(n)) return '—';
+            if (Math.abs(n) >= 1e9 || (Math.abs(n) < 0.0001 && n !== 0)) {
+                return n.toExponential(4);
+            }
+            return parseFloat(n.toPrecision(8)).toString();
+        }
+
+        function toBaseTemp(val, unit) {
+            if (unit === 'c') return val;
+            if (unit === 'f') return (val - 32) * 5 / 9;
+            if (unit === 'k') return val - 273.15;
+        }
+
+        function fromBaseTemp(val, unit) {
+            if (unit === 'c') return val;
+            if (unit === 'f') return val * 9 / 5 + 32;
+            if (unit === 'k') return val + 273.15;
+        }
+
+        function convert(val, fromId, toId, cat) {
+            if (val === '' || isNaN(val)) return NaN;
+            const n = parseFloat(val);
+            if (cat === 'temperature') {
+                const base = toBaseTemp(n, fromId);
+                return fromBaseTemp(base, toId);
+            }
+            const units = CATEGORIES[cat].units;
+            const fromU = units.find(u => u.id === fromId);
+            const toU = units.find(u => u.id === toId);
+            const base = n * fromU.factor;
+            return base / toU.factor;
+        }
+
+        function getUnitName(cat, id) {
+            return CATEGORIES[cat].units.find(u => u.id === id).name;
+        }
+
+        function populateSelects() {
+            const cat = CATEGORIES[currentCat];
+            const opts = cat.units.map(u =>
+                `<option value="${u.id}">${u.name}</option>`
+            ).join('');
+            selectFrom.innerHTML = opts;
+            selectTo.innerHTML = opts;
+            selectFrom.value = cat.defaultFrom;
+            selectTo.value = cat.defaultTo;
+        }
+
+        function renderQuick() {
+            const cat = CATEGORIES[currentCat];
+            quickGrid.innerHTML = cat.quick.map(q => {
+                const result = convert(q.v, q.from, q.to, currentCat);
+                const toName = getUnitName(currentCat, q.to);
+                return `<button class="quick-btn" data-v="${q.v}" data-from="${q.from}" data-to="${q.to}">
+                    <strong>${q.label}</strong><br>= ${fmt(result)} ${toName.split(' ')[0]}
+                </button>`;
+            }).join('');
+            quickGrid.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    inputFrom.value = btn.dataset.v;
+                    selectFrom.value = btn.dataset.from;
+                    selectTo.value = btn.dataset.to;
+                    doConvert();
+                });
+            });
+        }
+
+        function doConvert() {
+            const result = convert(inputFrom.value, selectFrom.value, selectTo.value, currentCat);
+            if (isNaN(result)) {
+                inputTo.value = '';
+                resultText.textContent = '—';
+                resultLabel.textContent = '';
+                return;
+            }
+            inputTo.value = fmt(result);
+            const fromName = getUnitName(currentCat, selectFrom.value);
+            const toName = getUnitName(currentCat, selectTo.value);
+            resultText.textContent = fmt(result);
+            resultLabel.textContent = `${inputFrom.value} ${fromName} = ${fmt(result)} ${toName}`;
+        }
+
+        function renderTabs() {
+            tabsEl.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) =>
+                `<button class="tab${key === currentCat ? ' active' : ''}" data-cat="${key}">
+                    ${cat.icon} ${cat.label}
+                </button>`
+            ).join('');
+            tabsEl.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    currentCat = tab.dataset.cat;
+                    renderTabs();
+                    populateSelects();
+                    renderQuick();
+                    doConvert();
+                });
+            });
+        }
+
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            const btn = document.getElementById('swapBtn');
+            btn.classList.add('spin');
+            setTimeout(() => btn.classList.remove('spin'), 300);
+            const tmp = selectFrom.value;
+            selectFrom.value = selectTo.value;
+            selectTo.value = tmp;
+            inputFrom.value = inputTo.value || inputFrom.value;
+            doConvert();
+        });
+
+        [inputFrom, selectFrom, selectTo].forEach(el => {
+            el.addEventListener('input', doConvert);
+            el.addEventListener('change', doConvert);
+        });
+
+        renderTabs();
+        populateSelects();
+        renderQuick();
+        doConvert();
+    </script>
+</body>
+</html>
