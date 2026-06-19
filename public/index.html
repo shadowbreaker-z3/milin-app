@@ -172,6 +172,110 @@
         .stat-card.schedule .stat-value { color: #a29bfe; }
         .stat-card.total .stat-value { color: #ffd200; }
 
+        /* Widgets */
+        .widgets {
+            margin-bottom: 28px;
+        }
+        .widgets-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .widgets-header h3 {
+            font-size: 1.05em;
+            font-weight: 600;
+        }
+        .widgets-header span {
+            font-size: 0.82em;
+            color: rgba(255,255,255,0.4);
+        }
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .widget {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 16px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 110px;
+        }
+        a.widget:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+        }
+        .widget-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .widget-icon { font-size: 1.4em; line-height: 1; }
+        .widget-tag {
+            font-size: 0.65em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .widget-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .widget-sub {
+            font-size: 0.78em;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.4;
+        }
+        .widget-loading { color: rgba(255,255,255,0.35); font-size: 0.85em; }
+
+        .widget-ai { border-color: rgba(67,233,123,0.25); }
+        .widget-ai .widget-tag { background: rgba(67,233,123,0.15); color: #43e97b; }
+        .widget-weather { border-color: rgba(86,204,242,0.25); }
+        .widget-weather .widget-tag { background: rgba(86,204,242,0.15); color: #56ccf2; }
+        .widget-aq { border-color: rgba(86,204,242,0.2); }
+        .widget-aq .widget-tag { background: rgba(86,204,242,0.12); color: #74b9ff; }
+        .widget-pomo { border-color: rgba(162,155,254,0.25); }
+        .widget-pomo .widget-tag { background: rgba(162,155,254,0.15); color: #a29bfe; }
+        .widget-cal { border-color: rgba(162,155,254,0.2); }
+        .widget-cal .widget-tag { background: rgba(162,155,254,0.12); color: #b8b5ff; }
+        .widget-year { border-color: rgba(240,147,251,0.25); cursor: default; }
+        .widget-year .widget-tag { background: rgba(240,147,251,0.15); color: #f093fb; }
+        .widget-notes { border-color: rgba(253,121,168,0.25); }
+        .widget-notes .widget-tag { background: rgba(253,121,168,0.15); color: #fd79a8; }
+
+        .widget-aq .level-good { color: #55efc4; }
+        .widget-aq .level-moderate { color: #ffeaa7; }
+        .widget-aq .level-bad { color: #fab1a0; }
+        .widget-aq .level-danger { color: #ff7675; }
+
+        .ai-chips {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+        }
+        .ai-chip {
+            font-size: 0.72em; padding: 5px 10px;
+            background: rgba(67,233,123,0.12);
+            border: 1px solid rgba(67,233,123,0.25);
+            border-radius: 20px; color: rgba(255,255,255,0.8);
+            text-decoration: none; transition: background 0.15s;
+        }
+        .ai-chip:hover { background: rgba(67,233,123,0.22); color: #fff; }
+
+        .weather-row {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .weather-row img { width: 44px; height: 44px; }
+
         /* Sections */
         .section {
             margin-bottom: 32px;
@@ -341,23 +445,23 @@
             </div>
 
             <div class="nav-label">หมวดหมู่</div>
-            <a href="#math" class="nav-item active" data-section="math">
+            <a href="#ai" class="nav-item active" data-section="ai">
+                <span class="dot" style="background:#43e97b"></span> AI &amp; สนุก
+            </a>
+            <a href="#schedule" class="nav-item" data-section="schedule">
+                <span class="dot" style="background:#a29bfe"></span> จัดการเวลา
+            </a>
+            <a href="#weather" class="nav-item" data-section="weather">
+                <span class="dot" style="background:#56ccf2"></span> สภาพอากาศ
+            </a>
+            <a href="#math" class="nav-item" data-section="math">
                 <span class="dot" style="background:#4facfe"></span> คณิตศาสตร์
             </a>
             <a href="#language" class="nav-item" data-section="language">
                 <span class="dot" style="background:#f093fb"></span> ภาษา
             </a>
-            <a href="#ai" class="nav-item" data-section="ai">
-                <span class="dot" style="background:#43e97b"></span> AI &amp; สนุก
-            </a>
-            <a href="#weather" class="nav-item" data-section="weather">
-                <span class="dot" style="background:#56ccf2"></span> สภาพอากาศ
-            </a>
             <a href="#creative" class="nav-item" data-section="creative">
                 <span class="dot" style="background:#fd79a8"></span> สร้างสรรค์
-            </a>
-            <a href="#schedule" class="nav-item" data-section="schedule">
-                <span class="dot" style="background:#a29bfe"></span> จัดการเวลา
             </a>
 
             <div class="sidebar-footer">Made with ❤️ for learning</div>
@@ -372,11 +476,100 @@
                 <div class="date-badge" id="dateDisplay"></div>
             </div>
 
+            <!-- Widgets -->
+            <section class="widgets" id="widgets">
+                <div class="widgets-header">
+                    <h3>⚡ วิดเจ็ตด่วน</h3>
+                    <span>ข้อมูลสำคัญโดยไม่ต้องเปิดแอป</span>
+                </div>
+                <div class="widget-grid">
+                    <div class="widget widget-ai">
+                        <div class="widget-head">
+                            <span class="widget-icon">🤖</span>
+                            <span class="widget-tag">AI</span>
+                        </div>
+                        <div class="widget-value" style="font-size:1em">คุยกับมิลลิ</div>
+                        <div class="ai-chips">
+                            <a href="/apps/kid-chatbot" class="ai-chip">สวัสดีมิลลิ!</a>
+                            <a href="/apps/kid-chatbot" class="ai-chip">เล่าเรื่องสนุกๆ</a>
+                            <a href="/apps/kid-chatbot" class="ai-chip">ช่วยสอนหน่อย</a>
+                        </div>
+                    </div>
+
+                    <a href="/apps/weather" class="widget widget-weather" id="widgetWeather">
+                        <div class="widget-head">
+                            <span class="widget-icon">🌤️</span>
+                            <span class="widget-tag">Weather</span>
+                        </div>
+                        <div class="widget-loading" id="weatherContent">กำลังโหลด...</div>
+                    </a>
+
+                    <a href="/apps/air-quality" class="widget widget-aq" id="widgetAq">
+                        <div class="widget-head">
+                            <span class="widget-icon">😷</span>
+                            <span class="widget-tag">PM2.5</span>
+                        </div>
+                        <div class="widget-loading" id="aqContent">กำลังโหลด...</div>
+                    </a>
+
+                    <a href="/apps/pomodoro" class="widget widget-pomo" id="widgetPomo">
+                        <div class="widget-head">
+                            <span class="widget-icon">🍅</span>
+                            <span class="widget-tag">Pomodoro</span>
+                        </div>
+                        <div class="widget-value" id="pomoValue">0</div>
+                        <div class="widget-sub" id="pomoSub">🍅 โฟกัสวันนี้ · แตะเพื่อเริ่ม</div>
+                    </a>
+
+                    <a href="/apps/calendar" class="widget widget-cal" id="widgetCal">
+                        <div class="widget-head">
+                            <span class="widget-icon">📅</span>
+                            <span class="widget-tag">วันนี้</span>
+                        </div>
+                        <div class="widget-value" id="calValue">—</div>
+                        <div class="widget-sub" id="calSub">กิจกรรมวันนี้</div>
+                    </a>
+
+                    <a href="/apps/year-converter" class="widget widget-year">
+                        <div class="widget-head">
+                            <span class="widget-icon">📅</span>
+                            <span class="widget-tag">ปี</span>
+                        </div>
+                        <div class="widget-value" id="yearBe">—</div>
+                        <div class="widget-sub" id="yearCe">—</div>
+                    </a>
+
+                    <a href="/apps/notes" class="widget widget-notes" id="widgetNotes">
+                        <div class="widget-head">
+                            <span class="widget-icon">📝</span>
+                            <span class="widget-tag">โน้ต</span>
+                        </div>
+                        <div class="widget-value" id="noteTitle" style="font-size:1em">—</div>
+                        <div class="widget-sub" id="notePreview">ยังไม่มีโน้ต</div>
+                    </a>
+                </div>
+            </section>
+
             <div class="stats">
                 <div class="stat-card total">
                     <div class="stat-icon">📚</div>
                     <div class="stat-value">17</div>
                     <div class="stat-label">บทเรียนทั้งหมด</div>
+                </div>
+                <div class="stat-card ai">
+                    <div class="stat-icon">🤖</div>
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">AI &amp; สนุก</div>
+                </div>
+                <div class="stat-card schedule">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">จัดการเวลา</div>
+                </div>
+                <div class="stat-card weather">
+                    <div class="stat-icon">🌤️</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">สภาพอากาศ</div>
                 </div>
                 <div class="stat-card math">
                     <div class="stat-icon">🔢</div>
@@ -388,27 +581,32 @@
                     <div class="stat-value">5</div>
                     <div class="stat-label">ภาษา</div>
                 </div>
-                <div class="stat-card weather">
-                    <div class="stat-icon">🌤️</div>
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">สภาพอากาศ</div>
-                </div>
-                <div class="stat-card ai">
-                    <div class="stat-icon">🤖</div>
-                    <div class="stat-value">1</div>
-                    <div class="stat-label">AI &amp; สนุก</div>
-                </div>
                 <div class="stat-card creative">
                     <div class="stat-icon">🎨</div>
                     <div class="stat-value">2</div>
                     <div class="stat-label">สร้างสรรค์</div>
                 </div>
-                <div class="stat-card schedule">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-value">2</div>
-                    <div class="stat-label">จัดการเวลา</div>
-                </div>
             </div>
+
+            <!-- AI -->
+            <section class="section" id="ai">
+                <div class="section-header">
+                    <h3>🤖 AI &amp; สนุก</h3>
+                    <span>คุยและเล่นไปด้วยกัน</span>
+                    <div class="section-line"></div>
+                </div>
+                <div class="app-grid">
+                    <a href="/apps/kid-chatbot" class="app-card ai">
+                        <div class="app-top">
+                            <span class="app-icon">🤖</span>
+                            <span class="app-badge badge-ai">AI</span>
+                        </div>
+                        <div class="app-title">คุยกับมิลลิ</div>
+                        <div class="app-desc">แชทบอทเพื่อนหุ่นยนต์สำหรับเด็ก</div>
+                        <div class="app-arrow">เริ่มคุย →</div>
+                    </a>
+                </div>
+            </section>
 
             <!-- Math -->
             <section class="section" id="math">
@@ -518,26 +716,6 @@
                         <div class="app-title">แปลงปี พ.ศ. ↔ ค.ศ.</div>
                         <div class="app-desc">พุทธศักราช ↔ คริสต์ศักราช</div>
                         <div class="app-arrow">แปลงปี →</div>
-                    </a>
-                </div>
-            </section>
-
-            <!-- AI -->
-            <section class="section" id="ai">
-                <div class="section-header">
-                    <h3>🤖 AI &amp; สนุก</h3>
-                    <span>คุยและเล่นไปด้วยกัน</span>
-                    <div class="section-line"></div>
-                </div>
-                <div class="app-grid">
-                    <a href="/apps/kid-chatbot" class="app-card ai">
-                        <div class="app-top">
-                            <span class="app-icon">🤖</span>
-                            <span class="app-badge badge-ai">AI</span>
-                        </div>
-                        <div class="app-title">คุยกับมิลลิ</div>
-                        <div class="app-desc">แชทบอทเพื่อนหุ่นยนต์สำหรับเด็ก</div>
-                        <div class="app-arrow">เริ่มคุย →</div>
                     </a>
                 </div>
             </section>
@@ -681,6 +859,125 @@
             });
         }, { rootMargin: '-30% 0px -60% 0px' });
         sections.forEach(s => observer.observe(s));
+
+        /* ── Widgets ── */
+        const DEFAULT_LAT = 13.7563;
+        const DEFAULT_LON = 100.5018;
+
+        function fmtDateKey(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function pm25Level(v) {
+            if (v == null) return { label: 'ไม่มีข้อมูล', cls: '' };
+            if (v <= 15) return { label: 'ดีมาก', cls: 'level-good' };
+            if (v <= 25) return { label: 'ดี', cls: 'level-good' };
+            if (v <= 37) return { label: 'ปานกลาง', cls: 'level-moderate' };
+            if (v <= 50) return { label: 'เริ่มมีผล', cls: 'level-bad' };
+            return { label: 'อันตราย', cls: 'level-danger' };
+        }
+
+        function loadLocalWidgets() {
+            const today = fmtDateKey(new Date());
+            const ce = now.getFullYear();
+            const be = ce + 543;
+            document.getElementById('yearBe').textContent = `พ.ศ. ${be}`;
+            document.getElementById('yearCe').textContent = `ค.ศ. ${ce}`;
+
+            try {
+                const pomo = JSON.parse(localStorage.getItem('milin_pomodoro') || '{}');
+                const pomoToday = pomo.todayDate === today ? (pomo.today || 0) : 0;
+                document.getElementById('pomoValue').textContent = pomoToday + ' 🍅';
+                document.getElementById('pomoSub').textContent =
+                    pomoToday ? 'รอบโฟกัสวันนี้ · แตะเพื่อต่อ' : 'ยังไม่โฟกัสวันนี้ · แตะเพื่อเริ่ม';
+            } catch {}
+
+            try {
+                const events = JSON.parse(localStorage.getItem('milin_calendar_events') || '[]');
+                const todayEvents = events.filter(e => e.date === today);
+                const calVal = document.getElementById('calValue');
+                const calSub = document.getElementById('calSub');
+                if (!todayEvents.length) {
+                    calVal.textContent = 'ว่าง';
+                    calSub.textContent = 'ไม่มีกิจกรรมวันนี้';
+                } else {
+                    calVal.textContent = todayEvents.length + ' รายการ';
+                    const first = todayEvents.sort((a, b) => (a.time || '').localeCompare(b.time || ''))[0];
+                    calSub.textContent = (first.time ? first.time + ' ' : '') + first.title;
+                }
+            } catch {}
+
+            try {
+                const notes = JSON.parse(localStorage.getItem('milin_notes') || '[]');
+                const noteTitle = document.getElementById('noteTitle');
+                const notePreview = document.getElementById('notePreview');
+                if (!notes.length) {
+                    noteTitle.textContent = 'ยังไม่มีโน้ต';
+                    notePreview.textContent = 'แตะเพื่อเริ่มจด';
+                } else {
+                    const latest = [...notes].sort((a, b) =>
+                        new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+                    noteTitle.textContent = latest.title || 'โน้ตใหม่';
+                    notePreview.textContent = (latest.content || '').replace(/\n/g, ' ').slice(0, 40) || 'ไม่มีเนื้อหา';
+                }
+            } catch {}
+        }
+
+        async function loadApiWidgets(lat, lon) {
+            const qs = `lat=${lat}&lon=${lon}`;
+            const weatherEl = document.getElementById('weatherContent');
+            const aqEl = document.getElementById('aqContent');
+
+            const [weatherRes, aqRes] = await Promise.allSettled([
+                fetch('/api/weather?' + qs).then(r => r.json()),
+                fetch('/api/air-quality?' + qs).then(r => r.json()),
+            ]);
+
+            if (weatherRes.status === 'fulfilled' && weatherRes.value.weather) {
+                const { location, weather } = weatherRes.value;
+                const cur = weather.current;
+                const icon = cur.weather?.[0]?.icon || '01d';
+                const desc = cur.weather?.[0]?.description || '';
+                weatherEl.innerHTML = `
+                    <div class="weather-row">
+                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="">
+                        <div>
+                            <div class="widget-value">${Math.round(cur.temp)}°C</div>
+                            <div class="widget-sub">${location.name} · ${desc}</div>
+                        </div>
+                    </div>`;
+            } else {
+                weatherEl.innerHTML = '<div class="widget-sub">ไม่สามารถโหลดอากาศได้<br>แตะเพื่อเปิดแอป</div>';
+            }
+
+            if (aqRes.status === 'fulfilled' && aqRes.value.current) {
+                const pm = aqRes.value.current.pm2_5;
+                const lvl = pm25Level(pm);
+                aqEl.innerHTML = `
+                    <div class="widget-value ${lvl.cls}">${pm != null ? Math.round(pm) : '—'}</div>
+                    <div class="widget-sub">µg/m³ · ${lvl.label}</div>`;
+            } else {
+                aqEl.innerHTML = '<div class="widget-sub">ไม่สามารถโหลด PM2.5 ได้<br>แตะเพื่อเปิดแอป</div>';
+            }
+        }
+
+        function initWidgets() {
+            loadLocalWidgets();
+            const fallback = () => loadApiWidgets(DEFAULT_LAT, DEFAULT_LON);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => loadApiWidgets(pos.coords.latitude, pos.coords.longitude),
+                    fallback,
+                    { timeout: 8000, maximumAge: 300000 }
+                );
+            } else {
+                fallback();
+            }
+        }
+        initWidgets();
     </script>
 </body>
 </html>
