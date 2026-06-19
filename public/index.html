@@ -253,6 +253,8 @@
         .widget-year .widget-tag { background: rgba(240,147,251,0.15); color: #f093fb; }
         .widget-notes { border-color: rgba(253,121,168,0.25); }
         .widget-notes .widget-tag { background: rgba(253,121,168,0.15); color: #fd79a8; }
+        .widget-clock { border-color: rgba(162,155,254,0.3); }
+        .widget-clock .widget-tag { background: rgba(162,155,254,0.18); color: #a29bfe; }
 
         .widget-aq .level-good { color: #55efc4; }
         .widget-aq .level-moderate { color: #ffeaa7; }
@@ -539,6 +541,15 @@
                         <div class="widget-sub" id="yearCe">—</div>
                     </a>
 
+                    <a href="/apps/clock" class="widget widget-clock" id="widgetClock">
+                        <div class="widget-head">
+                            <span class="widget-icon">🕐</span>
+                            <span class="widget-tag">Clock</span>
+                        </div>
+                        <div class="widget-value" id="clockTime" style="font-variant-numeric:tabular-nums">--:--</div>
+                        <div class="widget-sub" id="clockDate">กำลังโหลด...</div>
+                    </a>
+
                     <a href="/apps/notes" class="widget widget-notes" id="widgetNotes">
                         <div class="widget-head">
                             <span class="widget-icon">📝</span>
@@ -553,7 +564,7 @@
             <div class="stats">
                 <div class="stat-card total">
                     <div class="stat-icon">📚</div>
-                    <div class="stat-value">17</div>
+                    <div class="stat-value">19</div>
                     <div class="stat-label">บทเรียนทั้งหมด</div>
                 </div>
                 <div class="stat-card ai">
@@ -563,7 +574,7 @@
                 </div>
                 <div class="stat-card schedule">
                     <div class="stat-icon">📅</div>
-                    <div class="stat-value">2</div>
+                    <div class="stat-value">4</div>
                     <div class="stat-label">จัดการเวลา</div>
                 </div>
                 <div class="stat-card weather">
@@ -782,7 +793,7 @@
             <section class="section" id="schedule">
                 <div class="section-header">
                     <h3>📅 จัดการเวลา</h3>
-                    <span>ปฏิทิน Pomodoro และตารางกิจกรรม</span>
+                    <span>ปฏิทิน นาฬิกา จับเวลา และ Pomodoro</span>
                     <div class="section-line"></div>
                 </div>
                 <div class="app-grid">
@@ -803,6 +814,24 @@
                         <div class="app-title">Pomodoro Timer</div>
                         <div class="app-desc">โฟกัสเรียน 25 นาที พักผ่อนเป็นระยะ</div>
                         <div class="app-arrow">เริ่มโฟกัส →</div>
+                    </a>
+                    <a href="/apps/clock" class="app-card schedule">
+                        <div class="app-top">
+                            <span class="app-icon">🕐</span>
+                            <span class="app-badge badge-schedule">Time</span>
+                        </div>
+                        <div class="app-title">นาฬิกา</div>
+                        <div class="app-desc">ดูเวลาปัจจุบันและเวลาทั่วโลก</div>
+                        <div class="app-arrow">ดูเวลา →</div>
+                    </a>
+                    <a href="/apps/stopwatch" class="app-card schedule">
+                        <div class="app-top">
+                            <span class="app-icon">⏱️</span>
+                            <span class="app-badge badge-schedule">Timer</span>
+                        </div>
+                        <div class="app-title">จับเวลา</div>
+                        <div class="app-desc">วัดเวลาที่ใช้ นับถอยหลัง และ Lap</div>
+                        <div class="app-arrow">เริ่มจับ →</div>
                     </a>
                 </div>
             </section>
@@ -886,6 +915,16 @@
             const be = ce + 543;
             document.getElementById('yearBe').textContent = `พ.ศ. ${be}`;
             document.getElementById('yearCe').textContent = `ค.ศ. ${ce}`;
+
+            function updateClockWidget() {
+                const d = new Date();
+                document.getElementById('clockTime').textContent =
+                    d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
+                document.getElementById('clockDate').textContent =
+                    `วัน${thaiDays[d.getDay()]} ${d.getDate()} ${thaiMonths[d.getMonth()]}`;
+            }
+            updateClockWidget();
+            setInterval(updateClockWidget, 1000);
 
             try {
                 const pomo = JSON.parse(localStorage.getItem('milin_pomodoro') || '{}');

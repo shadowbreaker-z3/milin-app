@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕐 นาฬิกา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: #0f0c29;
+            color: #fff;
+            padding: 20px;
+        }
+        .wrap { max-width: 520px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.9em;
+        }
+        .hub-link:hover { color: #fff; }
+
+        h1 { text-align: center; font-size: 1.5em; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 0.88em; color: rgba(255,255,255,0.45); margin-bottom: 24px; }
+
+        .main-clock {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .analog-wrap {
+            position: relative;
+            width: 220px; height: 220px;
+            margin: 0 auto 20px;
+        }
+        .analog {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 3px solid rgba(162,155,254,0.4);
+            position: relative;
+            box-shadow: 0 0 40px rgba(162,155,254,0.15), inset 0 0 30px rgba(0,0,0,0.3);
+        }
+        .analog .tick {
+            position: absolute;
+            width: 2px; height: 10px;
+            background: rgba(255,255,255,0.35);
+            left: 50%; top: 8px;
+            transform-origin: 50% 102px;
+            margin-left: -1px;
+        }
+        .analog .tick.major {
+            height: 14px; width: 3px;
+            background: rgba(255,255,255,0.6);
+            margin-left: -1.5px;
+        }
+        .analog .num {
+            position: absolute;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            transform: translate(-50%, -50%);
+        }
+        .hand {
+            position: absolute;
+            bottom: 50%; left: 50%;
+            transform-origin: 50% 100%;
+            border-radius: 4px;
+            z-index: 2;
+        }
+        .hand-hour {
+            width: 5px; height: 55px;
+            margin-left: -2.5px;
+            background: #a29bfe;
+        }
+        .hand-min {
+            width: 3px; height: 75px;
+            margin-left: -1.5px;
+            background: #fff;
+        }
+        .hand-sec {
+            width: 2px; height: 85px;
+            margin-left: -1px;
+            background: #fd79a8;
+        }
+        .center-dot {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #a29bfe;
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #fff;
+            z-index: 5;
+        }
+
+        .digital {
+            font-size: 3.2em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-variant-numeric: tabular-nums;
+            color: #a29bfe;
+            line-height: 1;
+        }
+        .digital-sec {
+            font-size: 0.45em;
+            color: rgba(255,255,255,0.45);
+            vertical-align: super;
+        }
+        .date-line {
+            margin-top: 10px;
+            font-size: 1em;
+            color: rgba(255,255,255,0.65);
+        }
+        .date-sub {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+
+        .toggle-row {
+            display: flex; justify-content: center; gap: 8px;
+            margin-top: 16px;
+        }
+        .toggle-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            font-family: inherit; font-size: 0.8em;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .toggle-btn.active {
+            background: rgba(162,155,254,0.2);
+            border-color: #a29bfe;
+            color: #fff;
+        }
+
+        .world-title {
+            font-size: 0.9em; font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+        .world-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .world-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .world-card .city {
+            font-size: 0.82em;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 4px;
+        }
+        .world-card .wt {
+            font-size: 1.4em;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+        }
+        .world-card .wd {
+            font-size: 0.72em;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 400px) {
+            .digital { font-size: 2.6em; }
+            .world-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>🕐 นาฬิกา</h1>
+        <p class="subtitle">เวลาปัจจุบันและเวลาทั่วโลก</p>
+
+        <div class="main-clock">
+            <div class="analog-wrap">
+                <div class="analog" id="analog">
+                    <div class="hand hand-hour" id="handHour"></div>
+                    <div class="hand hand-min" id="handMin"></div>
+                    <div class="hand hand-sec" id="handSec"></div>
+                    <div class="center-dot"></div>
+                </div>
+            </div>
+            <div class="digital" id="digital">00:00<span class="digital-sec" id="digitalSec">:00</span></div>
+            <div class="date-line" id="dateLine"></div>
+            <div class="date-sub" id="dateSub"></div>
+            <div class="toggle-row">
+                <button class="toggle-btn active" id="btn24">24 ชม.</button>
+                <button class="toggle-btn" id="btn12">12 ชม.</button>
+            </div>
+        </div>
+
+        <div class="world-title">🌍 เวลาทั่วโลก</div>
+        <div class="world-grid" id="worldGrid"></div>
+    </div>
+
+    <script>
+        const THAI_DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+        const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+            'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+        const ZONES = [
+            { city: '🇹🇭 กรุงเทพ', tz: 'Asia/Bangkok' },
+            { city: '🇯🇵 โตเกียว', tz: 'Asia/Tokyo' },
+            { city: '🇬🇧 ลอนดอน', tz: 'Europe/London' },
+            { city: '🇺🇸 นิวยอร์ก', tz: 'America/New_York' },
+        ];
+
+        let use24 = true;
+
+        function buildAnalogFace() {
+            const analog = document.getElementById('analog');
+            for (let i = 0; i < 12; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'tick' + (i % 3 === 0 ? ' major' : '');
+                tick.style.transform = `rotate(${i * 30}deg)`;
+                analog.appendChild(tick);
+
+                const num = document.createElement('div');
+                num.className = 'num';
+                num.textContent = i === 0 ? 12 : i;
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const r = 88;
+                num.style.left = (110 + r * Math.cos(angle)) + 'px';
+                num.style.top = (110 + r * Math.sin(angle)) + 'px';
+                analog.appendChild(num);
+            }
+        }
+
+        function fmtTime(d, tz, h24) {
+            return d.toLocaleTimeString('th-TH', {
+                timeZone: tz,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: !h24,
+            });
+        }
+
+        function fmtTimeShort(d, tz, h24) {
+            return d.toLocaleTimeString('th-TH', {
+                timeZone: tz,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: !h24,
+            });
+        }
+
+        function fmtDateThai(d) {
+            const day = THAI_DAYS[d.getDay()];
+            const date = d.getDate();
+            const month = THAI_MONTHS[d.getMonth()];
+            const year = d.getFullYear() + 543;
+            return `วัน${day}ที่ ${date} ${month} ${year}`;
+        }
+
+        function update() {
+            const now = new Date();
+
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ms = now.getMilliseconds();
+
+            document.getElementById('handHour').style.transform =
+                `rotate(${(h % 12) * 30 + m * 0.5 + s / 120}deg)`;
+            document.getElementById('handMin').style.transform =
+                `rotate(${m * 6 + s * 0.1}deg)`;
+            document.getElementById('handSec').style.transform =
+                `rotate(${s * 6 + ms * 0.006}deg)`;
+
+            const timeStr = now.toLocaleTimeString('th-TH', {
+                hour: '2-digit', minute: '2-digit', hour12: !use24,
+            });
+            const secStr = ':' + String(s).padStart(2, '0');
+            document.getElementById('digital').innerHTML =
+                timeStr + `<span class="digital-sec">${secStr}</span>`;
+
+            document.getElementById('dateLine').textContent = fmtDateThai(now);
+            document.getElementById('dateSub').textContent =
+                now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            document.getElementById('worldGrid').innerHTML = ZONES.map(z => {
+                const wt = fmtTimeShort(now, z.tz, use24);
+                const wd = now.toLocaleDateString('th-TH', {
+                    timeZone: z.tz, weekday: 'short', day: 'numeric', month: 'short',
+                });
+                return `<div class="world-card">
+                    <div class="city">${z.city}</div>
+                    <div class="wt">${wt}</div>
+                    <div class="wd">${wd}</div>
+                </div>`;
+            }).join('');
+        }
+
+        document.getElementById('btn24').addEventListener('click', () => {
+            use24 = true;
+            document.getElementById('btn24').classList.add('active');
+            document.getElementById('btn12').classList.remove('active');
+            update();
+        });
+        document.getElementById('btn12').addEventListener('click', () => {
+            use24 = false;
+            document.getElementById('btn12').classList.add('active');
+            document.getElementById('btn24').classList.remove('active');
+            update();
+        });
+
+        buildAnalogFace();
+        update();
+        setInterval(update, 1000);
+        requestAnimationFrame(function tick() {
+            const now = new Date();
+            const s = now.getSeconds();
+            const ms = now.getMilliseconds();
+            document.getElementById('handSec').style.transform =
+                `rotate(${s * 6 + ms * 0.006}deg)`;
+            requestAnimationFrame(tick);
+        });
+    </script>
+</body>
+</html>

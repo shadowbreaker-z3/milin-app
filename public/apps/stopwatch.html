@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏱️ จับเวลา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Thai', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: #0f0c29;
+            color: #fff;
+            padding: 20px;
+        }
+        .wrap { max-width: 440px; margin: 0 auto; }
+        .hub-link {
+            display: inline-block; margin-bottom: 12px;
+            color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.9em;
+        }
+        .hub-link:hover { color: #fff; }
+
+        h1 { text-align: center; font-size: 1.5em; font-weight: 700; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 0.88em; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+
+        .modes {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;
+        }
+        .mode-btn {
+            padding: 8px 18px; border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.65);
+            font-family: inherit; font-size: 0.88em;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .mode-btn.active {
+            border-color: #a29bfe;
+            background: rgba(162,155,254,0.15);
+            color: #fff; font-weight: 600;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 28px 20px;
+            margin-bottom: 16px;
+        }
+
+        .display {
+            font-size: 3.4em;
+            font-weight: 700;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            color: #a29bfe;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+        .display .ms {
+            font-size: 0.45em;
+            color: rgba(255,255,255,0.4);
+        }
+        .display.countdown-done { color: #55efc4; animation: pulse 0.6s ease infinite alternate; }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.6; } }
+
+        .controls {
+            display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px; border-radius: 14px;
+            border: none; font-family: inherit;
+            font-size: 1em; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+            min-width: 100px;
+        }
+        .btn-primary { background: #a29bfe; color: #fff; }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+        .btn-lap { background: rgba(253,203,110,0.2); color: #fdcb6e; border: 1px solid rgba(253,203,110,0.3); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .laps-title {
+            font-size: 0.85em; font-weight: 600;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 10px;
+        }
+        .lap-list {
+            max-height: 200px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .lap-item {
+            display: grid; grid-template-columns: 36px 1fr 1fr;
+            gap: 8px; align-items: center;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px; padding: 10px 12px;
+            font-size: 0.88em;
+            font-variant-numeric: tabular-nums;
+        }
+        .lap-item .num { color: rgba(255,255,255,0.35); font-weight: 600; }
+        .lap-item .split { color: #a29bfe; font-weight: 600; text-align: right; }
+        .lap-item .lap-time { color: rgba(255,255,255,0.5); text-align: right; }
+        .lap-header {
+            display: grid; grid-template-columns: 36px 1fr 1fr;
+            gap: 8px; padding: 0 12px 6px;
+            font-size: 0.72em; color: rgba(255,255,255,0.3);
+        }
+        .lap-header span:nth-child(2), .lap-header span:nth-child(3) { text-align: right; }
+        .empty-laps {
+            text-align: center; padding: 20px;
+            color: rgba(255,255,255,0.3); font-size: 0.88em;
+        }
+
+        .countdown-setup { text-align: center; }
+        .presets {
+            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .preset-btn {
+            padding: 8px 14px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
+            font-family: inherit; font-size: 0.85em;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .preset-btn:hover, .preset-btn.active {
+            border-color: #a29bfe;
+            background: rgba(162,155,254,0.15);
+            color: #fff;
+        }
+        .custom-time {
+            display: flex; gap: 8px; justify-content: center; align-items: center;
+            margin-bottom: 8px;
+        }
+        .custom-time input {
+            width: 70px; padding: 10px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px; color: #fff;
+            font-family: inherit; font-size: 1.1em;
+            text-align: center; outline: none;
+        }
+        .custom-time input:focus { border-color: #a29bfe; }
+        .custom-time span { color: rgba(255,255,255,0.45); font-size: 0.9em; }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 400px) {
+            .display { font-size: 2.6em; }
+            .btn { padding: 12px 20px; min-width: 80px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/" class="hub-link">← กลับ MilinHub</a>
+        <h1>⏱️ จับเวลา</h1>
+        <p class="subtitle">วัดเวลาที่ใช้ และนับถอยหลัง</p>
+
+        <div class="modes">
+            <button class="mode-btn active" data-mode="stopwatch">⏱️ จับเวลา</button>
+            <button class="mode-btn" data-mode="countdown">⏳ นับถอยหลัง</button>
+        </div>
+
+        <!-- Stopwatch -->
+        <div id="stopwatchPanel">
+            <div class="panel">
+                <div class="display" id="swDisplay">00:00<span class="ms">.00</span></div>
+                <div class="controls">
+                    <button class="btn btn-primary" id="swStart">▶ เริ่ม</button>
+                    <button class="btn btn-lap" id="swLap" disabled>⏱ Lap</button>
+                    <button class="btn btn-secondary" id="swReset">↺ รีเซ็ต</button>
+                </div>
+            </div>
+            <div class="laps-title">📋 รอบจับเวลา (Lap)</div>
+            <div class="lap-header hidden" id="lapHeader">
+                <span>#</span><span>รวม</span><span>รอบนี้</span>
+            </div>
+            <div class="lap-list" id="lapList">
+                <div class="empty-laps">กด Lap ระหว่างจับเวลาเพื่อบันทึกรอบ</div>
+            </div>
+        </div>
+
+        <!-- Countdown -->
+        <div id="countdownPanel" class="hidden">
+            <div class="panel">
+                <div class="countdown-setup" id="cdSetup">
+                    <div class="presets">
+                        <button class="preset-btn" data-secs="60">1 นาที</button>
+                        <button class="preset-btn" data-secs="180">3 นาที</button>
+                        <button class="preset-btn active" data-secs="300">5 นาที</button>
+                        <button class="preset-btn" data-secs="600">10 นาที</button>
+                    </div>
+                    <div class="custom-time">
+                        <input type="number" id="cdMin" min="0" max="99" value="5" placeholder="นาที">
+                        <span>นาที</span>
+                        <input type="number" id="cdSec" min="0" max="59" value="0" placeholder="วิ">
+                        <span>วินาที</span>
+                    </div>
+                </div>
+                <div class="display" id="cdDisplay">05:00<span class="ms">.00</span></div>
+                <div class="controls">
+                    <button class="btn btn-primary" id="cdStart">▶ เริ่ม</button>
+                    <button class="btn btn-secondary" id="cdReset">↺ รีเซ็ต</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ── Stopwatch ── */
+        let swRunning = false;
+        let swStartTime = 0;
+        let swElapsed = 0;
+        let swTimer = null;
+        let swLaps = [];
+        let swLastLap = 0;
+
+        const swDisplay = document.getElementById('swDisplay');
+        const swStartBtn = document.getElementById('swStart');
+        const swLapBtn = document.getElementById('swLap');
+        const lapList = document.getElementById('lapList');
+        const lapHeader = document.getElementById('lapHeader');
+
+        function fmtMs(ms, showMs) {
+            const totalSec = Math.floor(ms / 1000);
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            const cs = Math.floor((ms % 1000) / 10);
+            const base = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            return showMs ? `${base}<span class="ms">.${String(cs).padStart(2, '0')}</span>` : base;
+        }
+
+        function swNow() {
+            return swElapsed + (swRunning ? performance.now() - swStartTime : 0);
+        }
+
+        function renderSw() {
+            swDisplay.innerHTML = fmtMs(swNow(), true);
+        }
+
+        function renderLaps() {
+            if (!swLaps.length) {
+                lapHeader.classList.add('hidden');
+                lapList.innerHTML = '<div class="empty-laps">กด Lap ระหว่างจับเวลาเพื่อบันทึกรอบ</div>';
+                return;
+            }
+            lapHeader.classList.remove('hidden');
+            lapList.innerHTML = swLaps.map((lap, i) => `
+                <div class="lap-item">
+                    <span class="num">${swLaps.length - i}</span>
+                    <span class="split">${fmtMs(lap.total, false)}</span>
+                    <span class="lap-time">+${fmtMs(lap.lap, false)}</span>
+                </div>
+            `).join('');
+        }
+
+        swStartBtn.addEventListener('click', () => {
+            if (swRunning) {
+                swElapsed = swNow();
+                swRunning = false;
+                clearInterval(swTimer);
+                swStartBtn.textContent = '▶ ต่อ';
+                swLapBtn.disabled = true;
+            } else {
+                swStartTime = performance.now();
+                swRunning = true;
+                swStartBtn.textContent = '⏸ พัก';
+                swLapBtn.disabled = false;
+                swTimer = setInterval(renderSw, 47);
+            }
+        });
+
+        swLapBtn.addEventListener('click', () => {
+            const total = swNow();
+            swLaps.unshift({ total, lap: total - swLastLap });
+            swLastLap = total;
+            renderLaps();
+        });
+
+        document.getElementById('swReset').addEventListener('click', () => {
+            swRunning = false;
+            clearInterval(swTimer);
+            swElapsed = 0;
+            swLastLap = 0;
+            swLaps = [];
+            swStartBtn.textContent = '▶ เริ่ม';
+            swLapBtn.disabled = true;
+            renderSw();
+            renderLaps();
+        });
+
+        /* ── Countdown ── */
+        let cdTotal = 300000;
+        let cdRemaining = 300000;
+        let cdRunning = false;
+        let cdTimer = null;
+        let cdDone = false;
+
+        const cdDisplay = document.getElementById('cdDisplay');
+        const cdStartBtn = document.getElementById('cdStart');
+        const cdSetup = document.getElementById('cdSetup');
+
+        function getCustomSecs() {
+            const m = parseInt(document.getElementById('cdMin').value, 10) || 0;
+            const s = parseInt(document.getElementById('cdSec').value, 10) || 0;
+            return (m * 60 + s) * 1000 || 1000;
+        }
+
+        function renderCd() {
+            cdDisplay.innerHTML = fmtMs(cdRemaining, true);
+            cdDisplay.classList.toggle('countdown-done', cdDone);
+        }
+
+        function playDone() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [0, 0.4, 0.8].forEach(d => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.connect(g); g.connect(ctx.destination);
+                    o.frequency.value = 880;
+                    g.gain.value = 0.25;
+                    o.start(ctx.currentTime + d);
+                    o.stop(ctx.currentTime + d + 0.3);
+                });
+            } catch {}
+        }
+
+        function setCdDuration(ms) {
+            if (cdRunning) return;
+            cdTotal = ms;
+            cdRemaining = ms;
+            cdDone = false;
+            renderCd();
+        }
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const secs = +btn.dataset.secs;
+                document.getElementById('cdMin').value = Math.floor(secs / 60);
+                document.getElementById('cdSec').value = secs % 60;
+                setCdDuration(secs * 1000);
+            });
+        });
+
+        ['cdMin', 'cdSec'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                setCdDuration(getCustomSecs());
+            });
+        });
+
+        cdStartBtn.addEventListener('click', () => {
+            if (cdDone) {
+                cdRemaining = cdTotal;
+                cdDone = false;
+                renderCd();
+            }
+            if (cdRunning) {
+                cdRunning = false;
+                clearInterval(cdTimer);
+                cdStartBtn.textContent = '▶ ต่อ';
+                cdSetup.classList.remove('hidden');
+            } else {
+                if (cdRemaining <= 0) cdRemaining = cdTotal;
+                cdRunning = true;
+                cdStartBtn.textContent = '⏸ พัก';
+                cdSetup.classList.add('hidden');
+                const end = performance.now() + cdRemaining;
+                cdTimer = setInterval(() => {
+                    cdRemaining = Math.max(0, end - performance.now());
+                    renderCd();
+                    if (cdRemaining <= 0) {
+                        cdRunning = false;
+                        cdDone = true;
+                        clearInterval(cdTimer);
+                        cdStartBtn.textContent = '↺ อีกครั้ง';
+                        cdSetup.classList.remove('hidden');
+                        playDone();
+                    }
+                }, 47);
+            }
+        });
+
+        document.getElementById('cdReset').addEventListener('click', () => {
+            cdRunning = false;
+            cdDone = false;
+            clearInterval(cdTimer);
+            cdRemaining = cdTotal;
+            cdStartBtn.textContent = '▶ เริ่ม';
+            cdSetup.classList.remove('hidden');
+            renderCd();
+        });
+
+        /* ── Mode switch ── */
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const isSw = btn.dataset.mode === 'stopwatch';
+                document.getElementById('stopwatchPanel').classList.toggle('hidden', !isSw);
+                document.getElementById('countdownPanel').classList.toggle('hidden', isSw);
+            });
+        });
+
+        renderSw();
+        renderCd();
+    </script>
+</body>
+</html>
